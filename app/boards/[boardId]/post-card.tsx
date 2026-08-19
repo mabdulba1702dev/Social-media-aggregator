@@ -1,8 +1,15 @@
 import { PlatformBadge } from "@/components/platform-badge";
 import type { Platform } from "@/lib/embed-providers/types";
+import { PostTags } from "./post-tags";
+
+interface Tag {
+  id: string;
+  name: string;
+}
 
 interface Post {
   id: string;
+  board_id: string;
   platform: Platform;
   embed_html: string | null;
   embed_thumbnail_url: string | null;
@@ -10,6 +17,7 @@ interface Post {
   author_name: string | null;
   status: string;
   canonical_url: string;
+  tags: Tag[];
 }
 
 export function PostCard({ post }: { post: Post }) {
@@ -42,6 +50,8 @@ export function PostCard({ post }: { post: Post }) {
       )}
 
       {post.caption && <p className="p-3 text-[13.5px] text-text">{post.caption}</p>}
+
+      <PostTags postId={post.id} boardId={post.board_id} tags={post.tags} />
     </div>
   );
 }

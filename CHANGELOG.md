@@ -12,6 +12,9 @@ the same PR — see `CONTRIBUTING.md`.
 
 ### Added
 
+- Tags: inline add/remove per post, a filter bar on the board page.
+  Verified end-to-end against the real database, including the nested
+  `post_tags(tags(id,name))` PostgREST embedding the page relies on.
 - All 7 remaining embed providers: Instagram, X, TikTok, Reddit, Pinterest,
   Facebook, Threads — all 8 PRD §6.2 target platforms now implemented.
   Endpoints verified against Meta's own official plugin source and the

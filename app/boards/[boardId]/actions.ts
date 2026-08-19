@@ -64,3 +64,37 @@ export async function addPost(boardId: string, rawUrl: string): Promise<AddPostR
   revalidatePath(`/boards/${boardId}`);
   return { status: "ok" };
 }
+
+export type AddTagResult = { status: "ok" } | { status: "error"; message: string };
+
+export async function addTag(postId: string, boardId: string, tagName: string): Promise<AddTagResult> {
+  const trimmed = tagName.trim();
+  if (!trimmed) return { status: "error", message: "Tag name can't be empty." };
+
+  const supabase = await createClient();
+
+  const { data: tag, error: tagError } = await supabase
+    .from("tags")
+    .upsert({ board_id: boardId, name: trimmed }, { onConflict: "board_id,name" })
+    .select("id")
+    .single();
+
+  if (tagError) return { status: "error", message: tagError.message };
+
+  const { error: linkError } = await supabase
+    .from("post_tags")
+    .upsert({ post_id: postId, tag_id: tag.id }, { onConflict: "post_id,tag_id" });
+
+  if (linkError) return { status: "error", message: linkError.message };
+
+  revalidatePath(`/boards/${boardId}`);
+  return { status: "ok" };
+}
+
+export async function removeTag(postId: string, tagId: string, boardId: string): Promise<void> {
+  const supabase = await createClient();
+  const { error } = await supabase.from("post_tags").delete().eq("post_id", postId).eq("tag_id", tagId);
+  if (error) throw error;
+
+  revalidatePath(`/boards/${boardId}`);
+}
