@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { AddPostForm } from "./add-post-form";
 import { PostCard } from "./post-card";
 import { TagFilterBar } from "./tag-filter-bar";
+import { SearchBox } from "./search-box";
 import type { Platform } from "@/lib/embed-providers/types";
 
 interface RawPost {
@@ -24,10 +25,10 @@ export default async function BoardPage({
   searchParams,
 }: {
   params: Promise<{ boardId: string }>;
-  searchParams: Promise<{ tag?: string }>;
+  searchParams: Promise<{ tag?: string; q?: string }>;
 }) {
   const { boardId } = await params;
-  const { tag: activeTagId } = await searchParams;
+  const { tag: activeTagId, q: searchQuery } = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -43,14 +44,19 @@ export default async function BoardPage({
 
   if (boardError || !board) notFound();
 
-  const { data: rawPosts, error: postsError } = await supabase
+  let postsQuery = supabase
     .from("posts")
     .select(
       "id, board_id, platform, embed_html, embed_thumbnail_url, caption, author_name, status, canonical_url, post_tags(tags(id, name))"
     )
     .eq("board_id", boardId)
-    .order("created_at", { ascending: false })
-    .returns<RawPost[]>();
+    .order("created_at", { ascending: false });
+
+  if (searchQuery?.trim()) {
+    postsQuery = postsQuery.textSearch("search_vector", searchQuery.trim(), { type: "websearch" });
+  }
+
+  const { data: rawPosts, error: postsError } = await postsQuery.returns<RawPost[]>();
 
   if (postsError) throw postsError;
 
@@ -62,10 +68,11 @@ export default async function BoardPage({
     tags: post.post_tags.map((pt) => pt.tags).filter((t): t is { id: string; name: string } => t !== null),
   }));
 
-  const allTags = new Map<string, string>();
-  for (const post of posts) {
-    for (const tag of post.tags) allTags.set(tag.id, tag.name);
-  }
+  // Tag chips always reflect every tag used on the board, independent of the
+  // current search, so filters can be combined without the chip list
+  // shifting under the user as they type.
+  const { data: allTagRows } = await supabase.from("tags").select("id, name").eq("board_id", boardId);
+  const allTags = allTagRows ?? [];
 
   const visiblePosts = activeTagId
     ? posts.filter((post) => post.tags.some((tag) => tag.id === activeTagId))
@@ -82,18 +89,15 @@ export default async function BoardPage({
 
       <AddPostForm boardId={board.id} />
 
-      {allTags.size > 0 && (
-        <TagFilterBar
-          tags={[...allTags.entries()].map(([id, name]) => ({ id, name }))}
-          activeTagId={activeTagId ?? null}
-        />
-      )}
+      <SearchBox query={searchQuery ?? ""} activeTagId={activeTagId ?? null} />
+
+      {allTags.length > 0 && <TagFilterBar tags={allTags} activeTagId={activeTagId ?? null} query={searchQuery ?? ""} />}
 
       {visiblePosts.length === 0 ? (
         <p className="text-sm text-text-muted">
-          {posts.length === 0
+          {posts.length === 0 && !searchQuery
             ? "No posts yet — paste a URL above to save your first one."
-            : "No posts with this tag."}
+            : "No posts match your filters."}
         </p>
       ) : (
         <div className="columns-1 gap-4 sm:columns-2 lg:columns-3">

@@ -10,8 +10,17 @@ the same PR — see `CONTRIBUTING.md`.
 
 ## [Unreleased]
 
+### Changed
+
+- `posts.search_vector`: replaced the expression-based full-text search
+  index from `0001_init.sql` with a generated `tsvector` column + index
+  (`0002_posts_search_vector.sql`) — `supabase-js`'s `.textSearch()` needs
+  a real column, not an arbitrary indexed expression.
+
 ### Added
 
+- Search box on the board page (caption/author, combinable with the tag
+  filter), verified against real data.
 - Tags: inline add/remove per post, a filter bar on the board page.
   Verified end-to-end against the real database, including the nested
   `post_tags(tags(id,name))` PostgREST embedding the page relies on.
