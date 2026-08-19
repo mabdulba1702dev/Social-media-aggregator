@@ -19,10 +19,14 @@ item lands or a decision gets made — this is the "what's true right now" doc;
 
 ### What's blocking Phase 1 start
 
-1. PRD §14 assumptions #1 (naming), #3 (nesting depth), #4 (permission roles) need the project owner's sign-off — the schema already encodes proposed defaults for #3/#4, but they're not confirmed.
-2. No real Supabase project exists yet — `supabase db push` has never been run against anything.
-3. No Vercel project connected — needed both for real deploys and for preview-deployment-based staging (see `testing.md`).
+1. No real Supabase project exists yet — `npx supabase db push` has never been run against anything.
+2. No Vercel project connected — needed both for real deploys and for preview-deployment-based staging (see `testing.md`).
+3. No Google OAuth credentials created yet.
 4. `lib/embed-providers/types.ts` doesn't exist yet — first Phase 1 task, see `build-order.md`.
+
+### Resolved
+
+- PRD §14 #3 (nesting depth) and #4 (permission roles) confirmed 2026-08-19 — both match what's already in `0001_init.sql`, no schema change needed. #1 (naming) deliberately deferred — doesn't block any code.
 
 ### Known non-blocking issues
 
