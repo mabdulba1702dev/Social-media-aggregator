@@ -204,8 +204,8 @@ You asked me to make reasonable calls on everything not explicitly answered. Her
 
 1. **Naming/branding:** no name chosen yet — placeholder only. Needs a decision before Phase 1 ships anything public-facing.
 2. **Web vs. mobile app:** assumed responsive web app first, native mobile deferred to Phase 3+ evaluation, given no explicit answer.
-3. **Collection nesting (your "think about this" ask):** proposed model — a post can belong to **multiple** collections (many-to-many), and collections can be **nested one level deep** (a "folder" containing sub-boards) but not arbitrarily deep, to avoid the UI complexity of infinite nesting for limited real benefit at this scale. Tags stay flat and orthogonal to collections entirely.
-4. **Permission roles:** proposed owner/collaborator/viewer on shared boards; not explicitly specified by you.
+3. **Collection nesting — CONFIRMED 2026-08-19:** a post can belong to **multiple** collections (many-to-many), and collections can be **nested one level deep** (a "folder" containing sub-boards) but not arbitrarily deep. Already implemented in `supabase/migrations/0001_init.sql` (`parent_board_id` + the `enforce_single_level_nesting` trigger) — no schema change needed. Tags stay flat and orthogonal to collections entirely.
+4. **Permission roles — CONFIRMED 2026-08-19:** owner/collaborator/viewer on shared boards. Already implemented in `board_members`.
 5. **Notifications:** assumed none required for v1 beyond in-app state.
 6. **Dark/light mode:** assumed both, from day one — low cost to include now, expensive to retrofit.
 7. **Reference apps for visual direction:** you didn't name any specific ones — the mockup draws on Are.na and Pinterest for the grid/board feel and Raindrop.io for the sidebar/collections pattern, based on the research in §"landscape" from the earlier clarifying-questions round. Redirect me if you have different taste references in mind.

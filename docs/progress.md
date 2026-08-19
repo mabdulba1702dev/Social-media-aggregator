@@ -41,6 +41,10 @@ Phase 2 slot.
 2. No boards UI/API yet.
 3. `components/ui/` still has no real shadcn primitives pulled in.
 
+### Resolved
+
+- PRD §14 #3 (nesting depth) and #4 (permission roles) confirmed 2026-08-19 — both match what's already in `0001_init.sql`, no schema change needed. #1 (naming) deliberately deferred — doesn't block any code.
+
 ### Known non-blocking issues
 
 - `npm audit` reports 3 high-severity advisories, all transitive through Next.js's bundled `postcss`/`sharp`, only fixable via a Next 15 → 16 major bump. Not urgent at this size/stage; revisit before any public deploy.
