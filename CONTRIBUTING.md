@@ -20,13 +20,28 @@ early build-out phase, work lands on `dev` as it's finished — sometimes
 committed there directly, sometimes as a feature branch PR'd into it — rather
 than every change waiting on an individual PR merge before the next thing
 starts. `dev` gets its own CI run and its own Vercel preview deployment, same
-as `main`. `dev` → `main` happens as its own reviewed PR when a batch of work
-is ready to actually ship. This trades some of the strict one-PR-per-change
+as `main`. `dev` → `main` happens as its own PR — see auto-merge below for
+how that PR actually lands. This trades some of the strict one-PR-per-change
 review discipline above for speed while the project is still finding its
 shape — revisit this once there's more than one active contributor, since the
 tradeoff stops being worth it once review is the whole point (see
 `docs/testing.md` and the Code Review section below for why review still
 matters here).
+
+**Auto-merge on green CI (adopted 2026-08-20):** `main` has branch protection
+requiring the `lint, typecheck, test, build` check to pass before anything
+merges — no required human review, by design (see above). PRs opened by an
+agent get `gh pr merge --auto --squash`, so they merge themselves the moment
+CI passes, no click needed. **One PR represents exactly the diff that existed
+when it was opened** — pushing more commits to `dev` after a PR is already
+open does *not* retroactively get included in it (this bit us once: PR #4
+merged, but 5 more commits had landed on `dev` afterward with no PR tracking
+them until it was noticed). The fix is discipline, not tooling: open a PR
+**immediately** when a feature is done and gate-passing, not batched — never
+let unmerged work accumulate on `dev` waiting for a "good moment" to PR it.
+Schema changes touching RLS/security, anything handling secrets, and the
+WhatsApp/Baileys risk surface should still get an explicit human look before
+merging, even though nothing stops them from auto-merging technically.
 
 ## Before Opening a PR
 
