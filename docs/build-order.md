@@ -28,7 +28,7 @@ Check items off as they land (`[x]`) and keep this file in sync with
 - [x] GitHub Actions CI (`.github/workflows/ci.yml`) running the full gate
 - [x] Third-party skills pulled from skills.sh (shadcn, supabase, supabase-postgres-best-practices, vercel-react-best-practices)
 - [x] `docs/build-order.md`, `docs/progress.md`, `docs/testing.md`, `CHANGELOG.md`
-- [ ] PRD §14 assumptions #1 (naming), #3 (nesting), #4 (permission roles) confirmed by project owner
+- [x] PRD §14 assumptions #3 (nesting) and #4 (permission roles) confirmed by project owner — #1 (naming) deliberately deferred, doesn't block code
 - [ ] Supabase project created + linked (`supabase db push` run for real, not just local)
 - [ ] Vercel project created + connected to the GitHub repo (enables preview deployments per PR)
 - [ ] Google OAuth credentials created and wired into Supabase Auth
