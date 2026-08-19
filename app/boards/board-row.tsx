@@ -13,15 +13,19 @@ export function BoardRow({ id, name }: { id: string; name: string }) {
   const dirty = value.trim() !== name && value.trim().length > 0;
 
   return (
-    <li className="flex items-center gap-2 rounded-md border border-border bg-surface p-3">
-      <Button asChild variant="ghost" size="sm">
-        <Link href={`/boards/${id}`}>Open</Link>
-      </Button>
+    <li className="flex items-center gap-3 rounded-card border border-border bg-surface p-3 shadow-sm">
+      <Link
+        href={`/boards/${id}`}
+        className="flex-1 truncate text-[14px] font-semibold text-text hover:text-accent hover:underline"
+      >
+        {name}
+      </Link>
       <Input
         value={value}
         onChange={(e) => setValue(e.target.value)}
         disabled={isPending}
-        className="flex-1"
+        placeholder="Rename…"
+        className="w-40"
       />
       <Button
         variant="outline"

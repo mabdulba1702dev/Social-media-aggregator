@@ -1,8 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { createBoard } from "./actions";
+import { CreateBoardForm } from "./create-board-form";
 import { BoardRow } from "./board-row";
 
 export default async function BoardsPage() {
@@ -22,24 +20,30 @@ export default async function BoardsPage() {
   if (error) throw error;
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-6 p-8">
-      <h1 className="text-2xl font-semibold">Your boards</h1>
+    <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-8">
+      <h1 className="text-2xl font-semibold">
+        {boards.length === 0 ? "Create your first board" : "Manage boards"}
+      </h1>
 
-      <form action={createBoard} className="flex gap-2">
-        <Input name="name" placeholder="New board name" required className="flex-1" />
-        <Button type="submit">Create</Button>
-      </form>
+      <CreateBoardForm />
 
       {boards.length === 0 ? (
         <p className="text-sm text-text-muted">
-          No boards yet — create one above to start saving posts.
+          A board holds your saved posts — create one to get started. Once you have boards, they&apos;ll
+          show up in the sidebar for quick access.
         </p>
       ) : (
-        <ul className="flex flex-col gap-2">
-          {boards.map((board) => (
-            <BoardRow key={board.id} id={board.id} name={board.name} />
-          ))}
-        </ul>
+        <>
+          <p className="text-sm text-text-muted">
+            Rename or delete a board here. Click a board in the sidebar to open it and start saving
+            posts.
+          </p>
+          <ul className="flex flex-col gap-2">
+            {boards.map((board) => (
+              <BoardRow key={board.id} id={board.id} name={board.name} />
+            ))}
+          </ul>
+        </>
       )}
     </main>
   );

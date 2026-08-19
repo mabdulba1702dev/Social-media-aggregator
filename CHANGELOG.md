@@ -10,7 +10,28 @@ the same PR — see `CONTRIBUTING.md`.
 
 ## [Unreleased]
 
+### Fixed
+
+- Board creation could silently double-submit (no pending/loading state
+  meant a double-click fired two inserts) — real duplicate boards were
+  found on a live account this way. `CreateBoardForm` now uses
+  `useActionState` to disable the form for the whole pending window.
+- The "Open" link into a board was a low-contrast ghost-variant button,
+  easy to miss entirely, with no way to navigate between boards once
+  inside one. Added a persistent sidebar (`app/boards/layout.tsx`)
+  listing every board with active-state highlighting on every
+  `/boards/*` page.
+- Investigated a reported "delete doesn't work" bug: verified end-to-end
+  as a real RLS-scoped signed-in user (not the service-role client every
+  earlier test used, which bypasses RLS and would have masked exactly
+  this class of bug) — delete correctly removes the row. Almost
+  certainly the duplicate-boards bug above: deleting one of two
+  identically-named boards looks like nothing happened.
+
 ### Changed
+
+- Create-board and add-post forms now have real visual weight (card
+  treatment, prominent button) instead of bare inputs.
 
 - `posts.search_vector`: replaced the expression-based full-text search
   index from `0001_init.sql` with a generated `tsvector` column + index

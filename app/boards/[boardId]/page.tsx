@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AddPostForm } from "./add-post-form";
@@ -79,33 +78,40 @@ export default async function BoardPage({
     : posts;
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-5xl flex-col gap-6 p-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">{board.name}</h1>
-        <Link href="/boards" className="text-sm text-accent underline">
-          All boards
-        </Link>
+    <div className="flex flex-1 flex-col">
+      <div className="border-b border-border px-8 py-5">
+        <h1 className="text-[22px] font-bold tracking-tight text-text">{board.name}</h1>
+        <p className="mt-1 text-[13px] text-text-muted">
+          {posts.length} {posts.length === 1 ? "post" : "posts"}
+        </p>
       </div>
 
-      <AddPostForm boardId={board.id} />
+      <div className="flex flex-col gap-4 px-8 pt-5">
+        <AddPostForm boardId={board.id} />
 
-      <SearchBox query={searchQuery ?? ""} activeTagId={activeTagId ?? null} />
-
-      {allTags.length > 0 && <TagFilterBar tags={allTags} activeTagId={activeTagId ?? null} query={searchQuery ?? ""} />}
-
-      {visiblePosts.length === 0 ? (
-        <p className="text-sm text-text-muted">
-          {posts.length === 0 && !searchQuery
-            ? "No posts yet — paste a URL above to save your first one."
-            : "No posts match your filters."}
-        </p>
-      ) : (
-        <div className="columns-1 gap-4 sm:columns-2 lg:columns-3">
-          {visiblePosts.map((post) => (
-            <PostCard key={post.id} post={post} />
-          ))}
+        <div className="flex flex-wrap items-center gap-3">
+          <SearchBox query={searchQuery ?? ""} activeTagId={activeTagId ?? null} />
+          {allTags.length > 0 && (
+            <TagFilterBar tags={allTags} activeTagId={activeTagId ?? null} query={searchQuery ?? ""} />
+          )}
         </div>
-      )}
-    </main>
+      </div>
+
+      <div className="px-8 pb-16 pt-5">
+        {visiblePosts.length === 0 ? (
+          <p className="text-sm text-text-muted">
+            {posts.length === 0 && !searchQuery
+              ? "No posts yet — paste a URL above to save your first one."
+              : "No posts match your filters."}
+          </p>
+        ) : (
+          <div className="columns-1 gap-4 sm:columns-2 lg:columns-3">
+            {visiblePosts.map((post) => (
+              <PostCard key={post.id} post={post} />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
