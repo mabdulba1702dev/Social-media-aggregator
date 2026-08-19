@@ -34,7 +34,7 @@ npm run typecheck      # tsc --noEmit
 npm run test            # vitest run
 npm run test:watch      # vitest, watch mode
 npm run build             # production build (run before opening a PR)
-supabase db push        # apply pending migrations to the linked project
+npx supabase db push     # apply pending migrations to the linked project
 ```
 
 CI (`.github/workflows/ci.yml`) runs `lint` → `typecheck` → `test` → `build` on every PR and every push to `main` — the same four commands, automated. See `docs/testing.md` for the full testing strategy (what's unit-tested, why there's no automated E2E yet, how staging works via Vercel preview deployments).

@@ -10,7 +10,19 @@ the same PR — see `CONTRIBUTING.md`.
 
 ## [Unreleased]
 
+### Fixed
+
+- `eslint.config.mjs` never ignored `next-env.d.ts` (Next.js's own auto-generated,
+  do-not-edit file) — lint only ever passed because the file didn't exist until
+  the first `next build` created it. Added it to the ignore list.
+- `docs/setup-guide.md` recommended `npm install -g supabase`, which Supabase
+  deprecated. Corrected to the devDependency + `npx supabase` approach and
+  updated every other doc referencing a bare `supabase` command to match.
+
 ### Added
+
+- GitHub CLI (`gh`), Supabase CLI (as a project devDependency), and Vercel CLI
+  installed as the local tooling `docs/setup-guide.md` calls for.
 
 - Repo made real: git initialized, connected to the GitHub remote, `npm install`
   and the full lint/typecheck/build gate verified passing for the first time.
