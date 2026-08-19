@@ -15,6 +15,19 @@ npm run dev
 - Branch names: `feat/<short-description>`, `fix/<short-description>`, `chore/<short-description>`.
 - Commit messages: imperative mood, present tense ("add board sharing", not "added" or "adds"). Keep the first line under ~70 characters; use the body for the *why* if it's not obvious from the diff.
 
+**`dev` branch (deliberate speed tradeoff, adopted 2026-08-19):** during this
+early build-out phase, work lands on `dev` as it's finished — sometimes
+committed there directly, sometimes as a feature branch PR'd into it — rather
+than every change waiting on an individual PR merge before the next thing
+starts. `dev` gets its own CI run and its own Vercel preview deployment, same
+as `main`. `dev` → `main` happens as its own reviewed PR when a batch of work
+is ready to actually ship. This trades some of the strict one-PR-per-change
+review discipline above for speed while the project is still finding its
+shape — revisit this once there's more than one active contributor, since the
+tradeoff stops being worth it once review is the whole point (see
+`docs/testing.md` and the Code Review section below for why review still
+matters here).
+
 ## Before Opening a PR
 
 ```bash

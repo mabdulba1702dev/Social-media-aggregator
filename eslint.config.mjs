@@ -12,7 +12,9 @@ const eslintConfig = [
     }
   },
   {
-    ignores: [".next/**", "node_modules/**", "next-env.d.ts"]
+    // worker/ is a separate Node package (own tsconfig, no React) — the
+    // Next.js/React rule set above doesn't apply to it.
+    ignores: [".next/**", "node_modules/**", "next-env.d.ts", "worker/**"]
   }
 ];
 
