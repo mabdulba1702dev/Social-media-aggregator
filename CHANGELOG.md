@@ -12,6 +12,13 @@ the same PR — see `CONTRIBUTING.md`.
 
 ### Added
 
+- Auth: `/login` (Google sign-in), `/auth/callback`, `/auth/sign-out`, and
+  `middleware.ts` to refresh the Supabase session on every request.
+- Boards: `/boards` page (list + create), server actions for create/rename/
+  delete, slug generation with collision retry (`lib/slugify.ts`, tested).
+- shadcn primitives: button, input, label, card — remapped from shadcn's
+  default token names onto this project's actual custom token set.
+- WhatsApp paired live against a real dedicated number and verified working.
 - Embed-provider interface (`lib/embed-providers/types.ts`) and its first
   implementation, YouTube (via oEmbed).
 - URL normalization + dedup-hashing (`lib/normalize-url.ts`), unit tested.
@@ -30,6 +37,22 @@ the same PR — see `CONTRIBUTING.md`.
 
 ### Fixed
 
+- `worker/src/whatsapp.ts` requested a Baileys pairing code on the first
+  `connection.update` event instead of waiting for `update.qr` — the
+  underlying websocket wasn't open yet, causing a 428 "Precondition
+  Required" error. Fixed per Baileys' own reference pattern; verified
+  against a real paired session afterward.
+- Built auth's session-refresh file per Supabase's current docs, which
+  describe a `proxy.ts`/`export function proxy()` convention — this
+  project's installed Next.js (15.5.23, stable) doesn't support that yet
+  (confirmed empirically: no middleware artifact in the build output).
+  Used the traditional `middleware.ts`/`export function middleware()`
+  convention instead.
+- The four shadcn primitives pulled from the registry used shadcn's
+  *default* token names (`bg-primary`, `bg-card`, `border-input`, etc.),
+  none of which exist in this project's actual custom token set. Remapped
+  all four to the real tokens instead of leaving them unstyled or
+  introducing a second, competing color system.
 - `eslint.config.mjs` never ignored `next-env.d.ts` (Next.js's own auto-generated,
   do-not-edit file) — lint only ever passed because the file didn't exist until
   the first `next build` created it. Added it to the ignore list. Also added

@@ -40,8 +40,8 @@ Order matters within the phase — embeds need the provider interface before UI 
 
 1. [x] **Embed provider interface** — `lib/embed-providers/types.ts` defining the shared shape (URL matcher, fetch fn, normalized output). This is the bootstrap step the `add-embed-provider` skill depends on. Built ahead of schedule to unblock the WhatsApp reprioritization below.
 2. [x] **First embed provider: YouTube** — most reliable per PRD §8, proves the interface end to end. Same reason as above.
-3. [ ] **Auth** — Google OAuth via Supabase Auth, `profiles` row auto-creation trigger verified working.
-4. [ ] **Boards (personal only)** — create/rename/delete a board, owner-only, no sharing yet.
+3. [x] **Auth** — Google OAuth via Supabase Auth (`/login`, `/auth/callback`, `/auth/sign-out`, `middleware.ts` session refresh). `profiles` row auto-creation trigger not yet verified against a real completed sign-in (dev-server smoke tests only covered the unauthenticated path — no browser available to click through Google's consent screen).
+4. [x] **Boards (personal only)** — create/rename/delete a board, owner-only, no sharing yet. `/boards` page + server actions, slug generation with collision retry (tested).
 5. [ ] **Manual URL add (paste only)** — textbox → normalize URL → dedup check → provider fetch → insert `post`. Extension/share-sheet/bulk-import come later in this phase, not first.
 6. [ ] **Masonry board view** — render saved posts per `docs/ui-mockup.html`'s layout direction, lazy-loaded embeds.
 7. [ ] **Remaining core providers**: Instagram, X (with preview-card fallback — see PRD §8's specific warning on X), TikTok, Reddit, Pinterest, Facebook, Threads.
