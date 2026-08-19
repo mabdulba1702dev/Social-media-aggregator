@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { renameBoard, deleteBoard } from "./actions";
@@ -12,12 +13,19 @@ export function BoardRow({ id, name }: { id: string; name: string }) {
   const dirty = value.trim() !== name && value.trim().length > 0;
 
   return (
-    <li className="flex items-center gap-2 rounded-md border border-border bg-surface p-3">
+    <li className="flex items-center gap-3 rounded-card border border-border bg-surface p-3 shadow-sm">
+      <Link
+        href={`/boards/${id}`}
+        className="flex-1 truncate text-[14px] font-semibold text-text hover:text-accent hover:underline"
+      >
+        {name}
+      </Link>
       <Input
         value={value}
         onChange={(e) => setValue(e.target.value)}
         disabled={isPending}
-        className="flex-1"
+        placeholder="Rename…"
+        className="w-40"
       />
       <Button
         variant="outline"

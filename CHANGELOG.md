@@ -10,8 +10,51 @@ the same PR — see `CONTRIBUTING.md`.
 
 ## [Unreleased]
 
+### Fixed
+
+- Board creation could silently double-submit (no pending/loading state
+  meant a double-click fired two inserts) — real duplicate boards were
+  found on a live account this way. `CreateBoardForm` now uses
+  `useActionState` to disable the form for the whole pending window.
+- The "Open" link into a board was a low-contrast ghost-variant button,
+  easy to miss entirely, with no way to navigate between boards once
+  inside one. Added a persistent sidebar (`app/boards/layout.tsx`)
+  listing every board with active-state highlighting on every
+  `/boards/*` page.
+- Investigated a reported "delete doesn't work" bug: verified end-to-end
+  as a real RLS-scoped signed-in user (not the service-role client every
+  earlier test used, which bypasses RLS and would have masked exactly
+  this class of bug) — delete correctly removes the row. Almost
+  certainly the duplicate-boards bug above: deleting one of two
+  identically-named boards looks like nothing happened.
+
+### Changed
+
+- Create-board and add-post forms now have real visual weight (card
+  treatment, prominent button) instead of bare inputs.
+
+- `posts.search_vector`: replaced the expression-based full-text search
+  index from `0001_init.sql` with a generated `tsvector` column + index
+  (`0002_posts_search_vector.sql`) — `supabase-js`'s `.textSearch()` needs
+  a real column, not an arbitrary indexed expression.
+
 ### Added
 
+- Search box on the board page (caption/author, combinable with the tag
+  filter), verified against real data.
+- Tags: inline add/remove per post, a filter bar on the board page.
+  Verified end-to-end against the real database, including the nested
+  `post_tags(tags(id,name))` PostgREST embedding the page relies on.
+- All 7 remaining embed providers: Instagram, X, TikTok, Reddit, Pinterest,
+  Facebook, Threads — all 8 PRD §6.2 target platforms now implemented.
+  Endpoints verified against Meta's own official plugin source and the
+  community oEmbed provider registry. Shared fetch/error-handling logic
+  extracted into `oembed-fetch.ts` rather than repeated per provider.
+- Manual URL add: `/boards/[boardId]` (add-post form, post cards, a basic
+  CSS-columns masonry grid), `addPost` server action (normalize → dedup →
+  provider fetch → insert). Verified end-to-end against real infrastructure
+  (disposable test user, real oEmbed fetch, real dedup rejection) — see
+  `docs/progress.md`.
 - Auth: `/login` (Google sign-in), `/auth/callback`, `/auth/sign-out`, and
   `middleware.ts` to refresh the Supabase session on every request.
 - Boards: `/boards` page (list + create), server actions for create/rename/
