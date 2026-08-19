@@ -12,6 +12,11 @@ the same PR — see `CONTRIBUTING.md`.
 
 ### Added
 
+- All 7 remaining embed providers: Instagram, X, TikTok, Reddit, Pinterest,
+  Facebook, Threads — all 8 PRD §6.2 target platforms now implemented.
+  Endpoints verified against Meta's own official plugin source and the
+  community oEmbed provider registry. Shared fetch/error-handling logic
+  extracted into `oembed-fetch.ts` rather than repeated per provider.
 - Manual URL add: `/boards/[boardId]` (add-post form, post cards, a basic
   CSS-columns masonry grid), `addPost` server action (normalize → dedup →
   provider fetch → insert). Verified end-to-end against real infrastructure

@@ -42,10 +42,9 @@ Phase 2 slot.
 
 ### What's blocking the rest of Phase 1
 
-1. Remaining core embed providers (Instagram, X, TikTok, Reddit, Pinterest, Facebook, Threads) — only YouTube exists so far, so manual add only actually works for YouTube links right now (the UI says so explicitly).
-2. Lazy-loading embeds as they scroll into view — the masonry grid exists but renders every embed immediately.
-3. Tags, search, remaining manual-add paths (extension/share-sheet/bulk-import), deleted/unavailable-post handling.
-4. **Still open**: the actual Google OAuth click-through (consent screen → callback → landing back on the site signed in) has never been done by a human. Everything *around* it is now verified for real — the `handle_new_user` trigger, board creation, post creation, RLS — via a disposable test user created through the admin API, not through the OAuth flow itself. This is the one piece only a real browser can close.
+1. Lazy-loading embeds as they scroll into view — the masonry grid exists but renders every embed immediately.
+2. Tags, search, remaining manual-add paths (extension/share-sheet/bulk-import), deleted/unavailable-post handling.
+3. **Still open**: the actual Google OAuth click-through (consent screen → callback → landing back on the site signed in) has never been done by a human. Everything *around* it is now verified for real — the `handle_new_user` trigger, board creation, post creation, RLS, and now every embed provider — via a disposable test user created through the admin API, not through the OAuth flow itself. This is the one piece only a real browser can close.
 
 ### Resolved
 
@@ -65,3 +64,4 @@ Phase 2 slot.
 - 2026-08-19 — WhatsApp paired live against the dedicated number; fixed a real pairing-timing bug in the process.
 - 2026-08-20 — Auth (`/login`, `/auth/callback`, `/auth/sign-out`, `middleware.ts`) and Boards (`/boards`, create/rename/delete server actions) built — Phase 1 items 3–4. Fixed a real Next.js version mismatch (Supabase's current docs describe `proxy.ts`, this project's installed Next.js still needs `middleware.ts`) and a real shadcn/design-system token mismatch (pulled components used shadcn's default token names, none of which exist in this project's custom token set) — both caught by actually building and running the gate, not assumed.
 - 2026-08-20 — Manual URL add built (`/boards/[boardId]`, post cards, basic masonry grid, `addPost` server action) — Phase 1 item 5, item 6 partial. Verified the entire loop end-to-end against real infrastructure (disposable test user, real `handle_new_user` trigger fire, real YouTube oEmbed fetch, real insert, real dedup rejection, real cascade cleanup) — the first time any of this has been proven against the live project rather than just typechecked.
+- 2026-08-20 — All 7 remaining Phase 1 embed providers built (Instagram, X, TikTok, Reddit, Pinterest, Facebook, Threads) — Phase 1 item 7, all 8 target platforms now implemented. Extracted `oembed-fetch.ts`'s shared `fetchStandardOEmbed()` rather than repeating the same fetch/error-handling shape 7 times. Endpoints verified against Meta's own official WordPress plugin source and the community oEmbed provider registry (`iamcal/oembed`), not from memory — this mattered specifically because PRD §8 already flagged Meta's oEmbed policy as having changed recently. Live-tested against real posts; 5 of 7 confirmed fully working end-to-end, Instagram/Threads test URLs turned out stale (but got back a real, correctly-shaped Meta API error, confirming the endpoint itself is right), Reddit hit transient sandbox network flakiness after one earlier successful direct test.

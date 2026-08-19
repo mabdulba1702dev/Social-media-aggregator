@@ -25,7 +25,9 @@ export function AddPostForm({ boardId }: { boardId: string }) {
           setMessage("Already saved to this board.");
           break;
         case "unsupported":
-          setMessage("That platform isn't supported yet — only YouTube works right now.");
+          setMessage(
+            "That link isn't from a supported platform yet, or isn't a direct post/video link (e.g. a profile or homepage URL won't work)."
+          );
           break;
         case "error":
           setMessage(result.message);
@@ -40,7 +42,7 @@ export function AddPostForm({ boardId }: { boardId: string }) {
         <Input
           value={url}
           onChange={(e) => setUrl(e.target.value)}
-          placeholder="Paste a YouTube URL"
+          placeholder="Paste a YouTube, Instagram, X, TikTok, Reddit, Pinterest, Facebook, or Threads link"
           disabled={isPending}
           className="flex-1"
         />
