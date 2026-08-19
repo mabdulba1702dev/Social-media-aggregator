@@ -38,8 +38,8 @@ Check items off as they land (`[x]`) and keep this file in sync with
 
 Order matters within the phase — embeds need the provider interface before UI can render anything real, and boards need to exist before posts can belong to one.
 
-1. [ ] **Embed provider interface** — `lib/embed-providers/types.ts` defining the shared shape (URL matcher, fetch fn, normalized output). This is the bootstrap step the `add-embed-provider` skill depends on.
-2. [ ] **First embed provider: YouTube** — most reliable per PRD §8, proves the interface end to end.
+1. [x] **Embed provider interface** — `lib/embed-providers/types.ts` defining the shared shape (URL matcher, fetch fn, normalized output). This is the bootstrap step the `add-embed-provider` skill depends on. Built ahead of schedule to unblock the WhatsApp reprioritization below.
+2. [x] **First embed provider: YouTube** — most reliable per PRD §8, proves the interface end to end. Same reason as above.
 3. [ ] **Auth** — Google OAuth via Supabase Auth, `profiles` row auto-creation trigger verified working.
 4. [ ] **Boards (personal only)** — create/rename/delete a board, owner-only, no sharing yet.
 5. [ ] **Manual URL add (paste only)** — textbox → normalize URL → dedup check → provider fetch → insert `post`. Extension/share-sheet/bulk-import come later in this phase, not first.
@@ -54,12 +54,19 @@ Order matters within the phase — embeds need the provider interface before UI 
 
 ## Phase 2 — Group ingestion
 
-1. [ ] **Ingestion pipeline shape** — the shared `pipeline.ts` logic described in `worker/README.md` and the `add-ingestion-source` skill (extract → blocklist → dedup → embed-fetch → insert), built once, used by every source type.
+> **Reprioritization (2026-08-19):** WhatsApp (items 1 and 6 below) was pulled
+> forward and built ahead of Phase 1, per explicit project-owner request —
+> see `docs/PRD.md` §13 for the logged deviation from the documented phasing.
+> `CLAUDE.md`'s "flag rather than silently proceed" rule is why this note
+> exists instead of a silent reorder. Telegram/Discord items are unaffected
+> and remain in their original Phase 2 order.
+
+1. [x] **Ingestion pipeline shape** — the shared `pipeline.ts` logic described in `worker/README.md` and the `add-ingestion-source` skill (extract → blocklist → dedup → embed-fetch → insert), built once, used by every source type. Built platform-agnostic; WhatsApp is the first platform wired to it.
 2. [ ] **Telegram bot (webhook)** — `app/api/telegram/route.ts`, no worker infra needed.
 3. [ ] **Multi-board sharing/permissions** — owner/collaborator/viewer roles, board visibility (private/shared-link/public), before wiring bots into shared boards.
-4. [ ] **`worker/` process stood up** — deployed to Railway/Fly.io, holds the Discord Gateway + Baileys connections.
+4. [x] **`worker/` process stood up locally** — npm workspace package, WhatsApp side built (`worker/src/whatsapp.ts`). Not yet deployed to Railway/Fly.io, and Discord's Gateway client isn't built yet.
 5. [ ] **Discord bot (Gateway)** — same pipeline entry point as Telegram.
-6. [ ] **WhatsApp (Baileys)** — dedicated non-primary number, risk-mitigation checklist from `docs/setup-guide.md` §6 followed before going live.
+6. [x] **WhatsApp (Baileys) — code built**, not yet live: connection + pairing-code auth + session persistence + pipeline wiring done (`worker/src/whatsapp.ts`, `worker/src/pipeline.ts`). Blocked on (a) a dedicated non-primary number to pair against — risk-mitigation checklist from `docs/setup-guide.md` §6 still applies before going live — and (b) at least one real `board`/`sources` row to actually persist ingested posts into (needs Phase 1 auth + boards, items 3–4 above).
 7. [ ] **Realtime updates** — Supabase Realtime pushing new ingested posts into an open board view.
 8. [ ] **Queue-based ingestion** — move from direct pipeline calls to a real queue (Postgres-backed or Upstash Redis) once ingestion volume justifies it; this is the load-balancing practice rep from PRD §9.3 (see `swe.md`).
 

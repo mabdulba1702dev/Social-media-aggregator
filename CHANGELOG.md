@@ -10,11 +10,32 @@ the same PR — see `CONTRIBUTING.md`.
 
 ## [Unreleased]
 
+### Added
+
+- Embed-provider interface (`lib/embed-providers/types.ts`) and its first
+  implementation, YouTube (via oEmbed).
+- URL normalization + dedup-hashing (`lib/normalize-url.ts`), unit tested.
+- WhatsApp ingestion foundation: `worker/` converted to an npm workspace
+  package sharing `lib/` with the Next.js app; Baileys connection with
+  pairing-code auth and session persistence (`worker/src/whatsapp.ts`); the
+  shared ingestion pipeline (`worker/src/pipeline.ts`) implementing the
+  `ingestion_events` → blocklist → dedup → embed-fetch → `posts` shape from
+  the `add-ingestion-source` skill. Reprioritized ahead of the documented
+  Phase 2 sequencing per explicit request — see `docs/PRD.md` §13.
+- Real Supabase project linked and `0001_init.sql` pushed. Vercel project
+  connected. Google OAuth wired into Supabase Auth. Telegram/Discord bot
+  tokens obtained and verified live.
+- PRD §14 nesting and permission-role assumptions confirmed by the project
+  owner.
+
 ### Fixed
 
 - `eslint.config.mjs` never ignored `next-env.d.ts` (Next.js's own auto-generated,
   do-not-edit file) — lint only ever passed because the file didn't exist until
-  the first `next build` created it. Added it to the ignore list.
+  the first `next build` created it. Added it to the ignore list. Also added
+  `worker/**` to the ignore list — the Next.js/React ESLint rule set was
+  incorrectly flagging a Baileys function (`useMultiFileAuthState`) as a
+  malformed React Hook by name alone.
 - `docs/setup-guide.md` recommended `npm install -g supabase`, which Supabase
   deprecated. Corrected to the devDependency + `npx supabase` approach and
   updated every other doc referencing a bare `supabase` command to match.

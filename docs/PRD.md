@@ -190,6 +190,14 @@ You mentioned wanting `.claude` skills and a `CONTRIBUTING.md` set up for this r
 - **Phase 3 — Expansion:** bot activity summaries, LinkedIn/Bluesky/Twitch support, browser extension polish, notifications.
 - **Phase 4 — Hardening:** caching layer maturity, rate-limit tuning per provider, monitoring/observability on the worker fleet, evaluate native mobile app.
 
+**Reprioritization (2026-08-19):** WhatsApp's ingestion code (worker + Baileys
+connection + pipeline, plus the embed-provider interface and YouTube provider
+it depends on) was built ahead of this phasing, per explicit request, once a
+dedicated pairing number was in hand. It's not live yet — pairing and a real
+board to ingest into are still needed — but the code exists earlier than this
+roadmap originally called for. Telegram/Discord remain in their original Phase
+2 slot. See `docs/build-order.md` for the itemized state.
+
 ## 14. Assumptions Log — please confirm or correct
 
 You asked me to make reasonable calls on everything not explicitly answered. Here's every one of those calls in one place:
