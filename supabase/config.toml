@@ -1,0 +1,21 @@
+# Supabase local dev config. Generated fields (project_id, ports, etc.) get
+# filled in / adjusted automatically the first time you run `supabase init`
+# or `supabase link` — this is a minimal starting point, not the full file
+# the CLI would generate.
+
+[api]
+enabled = true
+port = 54321
+
+[db]
+port = 54322
+
+[studio]
+enabled = true
+port = 54323
+
+[auth]
+enabled = true
+# Google provider is configured in the Supabase dashboard (production) —
+# see docs/setup-guide.md §5. For local dev against a linked remote
+# project, auth runs against the real hosted config, not this file.

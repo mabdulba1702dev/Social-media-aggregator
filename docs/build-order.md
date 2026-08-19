@@ -1,0 +1,85 @@
+# Build Order
+
+This is the granular, checkable version of `PRD.md` §13. The PRD says *what* each
+phase contains at a product level; this doc breaks each phase into the actual
+units of work, in the order they should land, so a phase can be tracked to
+"done" instead of staying a vague bucket.
+
+**Rule from `CLAUDE.md`:** don't start a later phase's items before the current
+phase is solid. If you think you have a reason to jump ahead, flag it instead of
+silently doing it — see `CLAUDE.md`'s Build Order section.
+
+Check items off as they land (`[x]`) and keep this file in sync with
+`progress.md` — this file is the plan, `progress.md` is the current state.
+
+---
+
+## Phase 0 — Setup
+
+- [x] Repo scaffolding (Next.js 15 + TS + Tailwind + shadcn config)
+- [x] Supabase client helpers (`lib/supabase/client.ts`, `server.ts`)
+- [x] Initial schema migration (`supabase/migrations/0001_init.sql`)
+- [x] `docs/PRD.md`, `docs/database-schema.md`, `docs/design-system.md`, `docs/setup-guide.md`
+- [x] `CLAUDE.md`, `CONTRIBUTING.md`
+- [x] Project skills: `add-embed-provider`, `add-ingestion-source`
+- [x] Git repo initialized, connected to GitHub remote
+- [x] Verified `npm install` / lint / typecheck / build actually pass clean
+- [x] Vitest wired up (`npm run test`)
+- [x] GitHub Actions CI (`.github/workflows/ci.yml`) running the full gate
+- [x] Third-party skills pulled from skills.sh (shadcn, supabase, supabase-postgres-best-practices, vercel-react-best-practices)
+- [x] `docs/build-order.md`, `docs/progress.md`, `docs/testing.md`, `CHANGELOG.md`
+- [ ] PRD §14 assumptions #1 (naming), #3 (nesting), #4 (permission roles) confirmed by project owner
+- [ ] Supabase project created + linked (`supabase db push` run for real, not just local)
+- [ ] Vercel project created + connected to the GitHub repo (enables preview deployments per PR)
+- [ ] Google OAuth credentials created and wired into Supabase Auth
+- [ ] `components/ui/` populated with the first real shadcn primitives (button, card, input, badge — whatever Phase 1 UI needs first)
+
+## Phase 1 — MVP (personal use, manual add, core embeds)
+
+Order matters within the phase — embeds need the provider interface before UI can render anything real, and boards need to exist before posts can belong to one.
+
+1. [ ] **Embed provider interface** — `lib/embed-providers/types.ts` defining the shared shape (URL matcher, fetch fn, normalized output). This is the bootstrap step the `add-embed-provider` skill depends on.
+2. [ ] **First embed provider: YouTube** — most reliable per PRD §8, proves the interface end to end.
+3. [ ] **Auth** — Google OAuth via Supabase Auth, `profiles` row auto-creation trigger verified working.
+4. [ ] **Boards (personal only)** — create/rename/delete a board, owner-only, no sharing yet.
+5. [ ] **Manual URL add (paste only)** — textbox → normalize URL → dedup check → provider fetch → insert `post`. Extension/share-sheet/bulk-import come later in this phase, not first.
+6. [ ] **Masonry board view** — render saved posts per `docs/ui-mockup.html`'s layout direction, lazy-loaded embeds.
+7. [ ] **Remaining core providers**: Instagram, X (with preview-card fallback — see PRD §8's specific warning on X), TikTok, Reddit, Pinterest, Facebook, Threads.
+8. [ ] **Tags** — create/assign/filter, many-to-many per schema.
+9. [ ] **Search** — Postgres `tsvector` full-text search across caption/author, plus platform/tag/date filters.
+10. [ ] **Remaining manual-add paths** — browser extension, mobile share-sheet, bulk import.
+11. [ ] **Deleted/private source handling** — `status = 'unavailable'` badge path per `docs/database-schema.md`.
+
+**Phase 1 exit criteria:** a single user can sign in, create a board, paste a URL from any of the 8 target platforms, see it render as a live embed (or correct fallback), tag it, and find it again via search.
+
+## Phase 2 — Group ingestion
+
+1. [ ] **Ingestion pipeline shape** — the shared `pipeline.ts` logic described in `worker/README.md` and the `add-ingestion-source` skill (extract → blocklist → dedup → embed-fetch → insert), built once, used by every source type.
+2. [ ] **Telegram bot (webhook)** — `app/api/telegram/route.ts`, no worker infra needed.
+3. [ ] **Multi-board sharing/permissions** — owner/collaborator/viewer roles, board visibility (private/shared-link/public), before wiring bots into shared boards.
+4. [ ] **`worker/` process stood up** — deployed to Railway/Fly.io, holds the Discord Gateway + Baileys connections.
+5. [ ] **Discord bot (Gateway)** — same pipeline entry point as Telegram.
+6. [ ] **WhatsApp (Baileys)** — dedicated non-primary number, risk-mitigation checklist from `docs/setup-guide.md` §6 followed before going live.
+7. [ ] **Realtime updates** — Supabase Realtime pushing new ingested posts into an open board view.
+8. [ ] **Queue-based ingestion** — move from direct pipeline calls to a real queue (Postgres-backed or Upstash Redis) once ingestion volume justifies it; this is the load-balancing practice rep from PRD §9.3 (see `swe.md`).
+
+**Phase 2 exit criteria:** connecting a Telegram/Discord/WhatsApp group to a board auto-ingests every matched link with no duplicates, visible in real time to every board member.
+
+## Phase 3 — Expansion
+
+- [ ] Bot activity summaries (deferred per PRD §6.4)
+- [ ] LinkedIn, Bluesky, Twitch providers
+- [ ] Browser extension polish
+- [ ] Notifications (in-app first, per PRD §6.10)
+
+## Phase 4 — Hardening
+
+- [ ] Caching layer maturity (embed response TTLs tuned per provider)
+- [ ] Rate-limit tuning per provider
+- [ ] Worker fleet monitoring/observability
+- [ ] Native mobile app evaluation
+
+---
+
+Cross-reference: `PRD.md` §13 (product-level phasing this expands on), `progress.md`
+(what's actually done right now), `CLAUDE.md` (the rule about not skipping ahead).

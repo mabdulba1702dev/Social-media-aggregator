@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Design tokens — mirrors docs/design-system.md. Keep both in sync. */
+:root {
+  --bg: #f6f5f3;
+  --surface: #ffffff;
+  --surface-2: #fbfaf8;
+  --border: #e7e4de;
+  --text: #201e1b;
+  --text-muted: #6f6a63;
+  --text-faint: #a49e94;
+  --accent: #2f5d4f;
+  --accent-soft: #e4ede9;
+}
+
+.dark {
+  --bg: #16151a;
+  --surface: #1e1d23;
+  --surface-2: #232228;
+  --border: #302f37;
+  --text: #efeeee;
+  --text-muted: #a5a3ab;
+  --text-faint: #706e78;
+  --accent: #7fc4ab;
+  --accent-soft: #22332c;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+}
