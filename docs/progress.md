@@ -4,7 +4,7 @@ Current state of the project, in plain terms. Update this whenever a build-order
 item lands or a decision gets made — this is the "what's true right now" doc;
 `build-order.md` is the plan, `CHANGELOG.md` is the history.
 
-## Status: Phase 1 core loop working (auth + boards), WhatsApp foundation paired
+## Status: Phase 1 core loop verified end-to-end (sign in → board → save a real post)
 
 **Last updated:** 2026-08-20
 
@@ -24,6 +24,8 @@ item lands or a decision gets made — this is the "what's true right now" doc;
 - **Auth built**: `/login` (Google sign-in), `/auth/callback` (`exchangeCodeForSession`), `/auth/sign-out`, `middleware.ts` refreshing the session on every request. Found and fixed a real gap while building this: the Supabase reference docs currently describe a `proxy.ts`/`export function proxy()` convention that this project's installed Next.js (15.5.23, stable) doesn't actually support yet — confirmed empirically (no middleware artifact in the build output under that name) and used the traditional `middleware.ts`/`export function middleware()` convention instead, which does produce a compiled `ƒ Middleware` entry. Smoke-tested via dev server: `/`, `/login`, `/auth/error` all 200; `/auth/callback` with no code correctly 307s to `/auth/error`. Full OAuth completion (the actual Google consent screen) hasn't been clicked through — no browser available in this environment to do that.
 - **Boards built**: `/boards` page (list + create form), server actions for create/rename/delete (`app/boards/actions.ts`), slug generation with collision retry (`lib/slugify.ts`, unit tested). Owner's `board_members` row is inserted alongside the board per the schema's uniform-permission-check design. Smoke-tested: `/boards` correctly 307s to `/login` when signed out.
 - **shadcn primitives pulled** (button, input, label, card) — found and fixed a real mismatch: the pulled components used shadcn's *default* token names (`bg-primary`, `bg-card`, `border-input`, etc.), none of which exist in this project's actual custom token set (`tailwind.config.ts`/`design-system.md`) — would have rendered essentially unstyled. Remapped all four components to the project's real tokens instead of introducing a second, competing color system.
+- **Manual URL add built and verified end-to-end against real infrastructure**: `/boards/[boardId]` (add-post form, post cards, a basic CSS-columns masonry grid), `app/boards/[boardId]/actions.ts`'s `addPost` (normalize → dedup check → provider fetch → insert). Verified for real, not just typechecked: created a disposable test user via the Supabase admin API, confirmed the `handle_new_user` trigger actually fires and creates a `profiles` row (this had never been observed before — closes a known gap), created a board, ran the exact `lib/embed-providers` + `lib/normalize-url` code against a real YouTube URL, got back a real oEmbed response (title, author, thumbnail, embed HTML), inserted the post, confirmed the `unique(board_id, url_hash)` constraint correctly rejects a duplicate insert, then deleted the test user and confirmed the cascade correctly removed the profile/board/post. Cleaned up completely — the real project tables are empty again.
+- Platform badge component (`components/platform-badge.tsx`) — literal per-platform Tailwind classes (not template-built) so the content scanner picks them up.
 
 ### Reprioritization note
 
@@ -40,10 +42,10 @@ Phase 2 slot.
 
 ### What's blocking the rest of Phase 1
 
-1. Manual URL add (paste → normalize → dedup → embed-fetch → insert `post`) doesn't exist yet — next logical piece, and it's what actually exercises the embed-provider + dedup code already built for the worker.
-2. Masonry board view — boards exist but have no post-browsing UI yet.
-3. Remaining core embed providers (Instagram, X, TikTok, Reddit, Pinterest, Facebook, Threads) — only YouTube exists so far.
-4. Full OAuth completion hasn't been verified end-to-end (no browser available here) — the `profiles` auto-creation trigger is written and reviewed but not yet observed firing against a real sign-in.
+1. Remaining core embed providers (Instagram, X, TikTok, Reddit, Pinterest, Facebook, Threads) — only YouTube exists so far, so manual add only actually works for YouTube links right now (the UI says so explicitly).
+2. Lazy-loading embeds as they scroll into view — the masonry grid exists but renders every embed immediately.
+3. Tags, search, remaining manual-add paths (extension/share-sheet/bulk-import), deleted/unavailable-post handling.
+4. **Still open**: the actual Google OAuth click-through (consent screen → callback → landing back on the site signed in) has never been done by a human. Everything *around* it is now verified for real — the `handle_new_user` trigger, board creation, post creation, RLS — via a disposable test user created through the admin API, not through the OAuth flow itself. This is the one piece only a real browser can close.
 
 ### Resolved
 
@@ -62,3 +64,4 @@ Phase 2 slot.
 - 2026-08-19 — WhatsApp ingestion foundation built (embed-provider interface + YouTube provider, URL normalization, worker package, Baileys connection, ingestion pipeline) — reprioritized ahead of Phase 1/2's documented order per explicit request.
 - 2026-08-19 — WhatsApp paired live against the dedicated number; fixed a real pairing-timing bug in the process.
 - 2026-08-20 — Auth (`/login`, `/auth/callback`, `/auth/sign-out`, `middleware.ts`) and Boards (`/boards`, create/rename/delete server actions) built — Phase 1 items 3–4. Fixed a real Next.js version mismatch (Supabase's current docs describe `proxy.ts`, this project's installed Next.js still needs `middleware.ts`) and a real shadcn/design-system token mismatch (pulled components used shadcn's default token names, none of which exist in this project's custom token set) — both caught by actually building and running the gate, not assumed.
+- 2026-08-20 — Manual URL add built (`/boards/[boardId]`, post cards, basic masonry grid, `addPost` server action) — Phase 1 item 5, item 6 partial. Verified the entire loop end-to-end against real infrastructure (disposable test user, real `handle_new_user` trigger fire, real YouTube oEmbed fetch, real insert, real dedup rejection, real cascade cleanup) — the first time any of this has been proven against the live project rather than just typechecked.

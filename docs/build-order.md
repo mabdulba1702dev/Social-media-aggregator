@@ -42,8 +42,8 @@ Order matters within the phase — embeds need the provider interface before UI 
 2. [x] **First embed provider: YouTube** — most reliable per PRD §8, proves the interface end to end. Same reason as above.
 3. [x] **Auth** — Google OAuth via Supabase Auth (`/login`, `/auth/callback`, `/auth/sign-out`, `middleware.ts` session refresh). `profiles` row auto-creation trigger not yet verified against a real completed sign-in (dev-server smoke tests only covered the unauthenticated path — no browser available to click through Google's consent screen).
 4. [x] **Boards (personal only)** — create/rename/delete a board, owner-only, no sharing yet. `/boards` page + server actions, slug generation with collision retry (tested).
-5. [ ] **Manual URL add (paste only)** — textbox → normalize URL → dedup check → provider fetch → insert `post`. Extension/share-sheet/bulk-import come later in this phase, not first.
-6. [ ] **Masonry board view** — render saved posts per `docs/ui-mockup.html`'s layout direction, lazy-loaded embeds.
+5. [x] **Manual URL add (paste only)** — `/boards/[boardId]`'s add-post form → normalize → dedup check → provider fetch → insert `post`. Verified end-to-end against the real Supabase project and a real YouTube oEmbed fetch (not just typechecked) — see `progress.md`. Extension/share-sheet/bulk-import still not built (item 10).
+6. [~] **Masonry board view** — basic CSS-columns grid built (`app/boards/[boardId]/page.tsx`), renders real embeds. Not yet done: lazy-loading embeds as they scroll into view (currently all render immediately).
 7. [ ] **Remaining core providers**: Instagram, X (with preview-card fallback — see PRD §8's specific warning on X), TikTok, Reddit, Pinterest, Facebook, Threads.
 8. [ ] **Tags** — create/assign/filter, many-to-many per schema.
 9. [ ] **Search** — Postgres `tsvector` full-text search across caption/author, plus platform/tag/date filters.

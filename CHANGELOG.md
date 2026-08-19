@@ -12,6 +12,11 @@ the same PR — see `CONTRIBUTING.md`.
 
 ### Added
 
+- Manual URL add: `/boards/[boardId]` (add-post form, post cards, a basic
+  CSS-columns masonry grid), `addPost` server action (normalize → dedup →
+  provider fetch → insert). Verified end-to-end against real infrastructure
+  (disposable test user, real oEmbed fetch, real dedup rejection) — see
+  `docs/progress.md`.
 - Auth: `/login` (Google sign-in), `/auth/callback`, `/auth/sign-out`, and
   `middleware.ts` to refresh the Supabase session on every request.
 - Boards: `/boards` page (list + create), server actions for create/rename/
