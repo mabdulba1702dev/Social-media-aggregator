@@ -14,7 +14,8 @@ Everything you need before writing feature code. Follow in order — each sectio
 | npm | Package manager (matches what you already use per your learning roadmap) | Bundled with Node |
 | Git | Version control | git-scm.com |
 | VS Code | Editor | code.visualstudio.com |
-| Supabase CLI | Local dev DB, migrations | `npm install -g supabase` |
+| GitHub CLI (`gh`) | Repo/PR management from the terminal | `winget install --id GitHub.cli -e` (Windows), `brew install gh` (macOS) |
+| Supabase CLI | Local dev DB, migrations | Already a project devDependency — run via `npx supabase <command>`. (`npm install -g supabase` is deprecated; don't use it.) |
 | Vercel CLI (optional) | Local preview of deployed env | `npm install -g vercel` |
 
 **Recommended VS Code extensions** (already pre-configured in `.vscode/extensions.json` in the scaffold — VS Code will prompt you to install them on first open):
@@ -64,12 +65,12 @@ Recommend **private** repo while this is pre-launch.
 3. Go to **Authentication → Providers → Google** and enable it — you'll need the Google OAuth client ID/secret from step 5 first.
 4. Link your local project to it:
    ```bash
-   supabase login
-   supabase link --project-ref <your-project-ref>
+   npx supabase login
+   npx supabase link --project-ref <your-project-ref>
    ```
 5. Apply the schema migration (already written for you in `supabase/migrations/0001_init.sql` — see `docs/database-schema.md`):
    ```bash
-   supabase db push
+   npx supabase db push
    ```
 
 ## 5. Google OAuth (for Sign in with Google)

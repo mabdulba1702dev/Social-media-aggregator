@@ -24,7 +24,7 @@ npm run test
 npm run build
 ```
 
-All four should pass clean — run them locally first; `.github/workflows/ci.yml` runs the same four on every PR, but CI shouldn't be your first feedback loop. If a migration was added, note in the PR description that `supabase db push` needs to be run against staging/prod — migrations aren't applied automatically on deploy.
+All four should pass clean — run them locally first; `.github/workflows/ci.yml` runs the same four on every PR, but CI shouldn't be your first feedback loop. If a migration was added, note in the PR description that `npx supabase db push` needs to be run against staging/prod — migrations aren't applied automatically on deploy.
 
 Every PR also gets a Vercel preview deployment automatically once the Vercel project is connected — that's this project's staging environment (see `docs/testing.md` §4), not a separate always-on server. If the PR touches UI, verify the acceptance criteria below against the preview URL, not just `localhost`.
 
