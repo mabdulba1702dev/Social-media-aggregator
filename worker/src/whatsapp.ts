@@ -24,12 +24,19 @@ async function start(): Promise<void> {
 
   sock.ev.on("creds.update", saveCreds);
 
-  sock.ev.on("connection.update", async (update) => {
-    const { connection, lastDisconnect } = update;
+  let pairingRequested = false;
 
-    if (!sock.authState.creds.registered) {
+  sock.ev.on("connection.update", async (update) => {
+    const { connection, lastDisconnect, qr } = update;
+
+    // Only request a pairing code once the socket has actually reached the
+    // point of offering a QR challenge — requesting it on an earlier
+    // connection.update (before the raw websocket is open) fails with a
+    // 428 "Precondition Required" / "Connection Closed" error from Baileys.
+    if (qr && !sock.authState.creds.registered && !pairingRequested) {
       const phoneNumber = process.env.WHATSAPP_PAIRING_NUMBER;
       if (phoneNumber) {
+        pairingRequested = true;
         const code = await sock.requestPairingCode(phoneNumber);
         logger.info({ code }, "WhatsApp pairing code — enter this in WhatsApp > Linked Devices");
       } else {

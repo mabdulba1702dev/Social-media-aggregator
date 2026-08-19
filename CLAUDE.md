@@ -39,6 +39,19 @@ npx supabase db push     # apply pending migrations to the linked project
 
 CI (`.github/workflows/ci.yml`) runs `lint` → `typecheck` → `test` → `build` on every PR and every push to `main` — the same four commands, automated. See `docs/testing.md` for the full testing strategy (what's unit-tested, why there's no automated E2E yet, how staging works via Vercel preview deployments).
 
+## Local Dev Hygiene
+
+Stop long-running local processes when they're not actively being used —
+don't leave `npm run dev`, `worker/` (`npm run dev` / `npm run start` in
+`worker/`, which holds an authenticated Baileys WhatsApp session and/or a
+Discord Gateway connection), or any other background dev process idling once
+you're done with the thing it was for. This matters more than usual for the
+worker specifically: it holds a live, persistent connection tied to a real
+WhatsApp account, not just a local port — no reason to keep that connection
+open when there's nothing wired up yet for it to actually do anything with
+(see `docs/progress.md` for what's currently blocking it from being useful
+left running).
+
 ## Build Order
 
 Follow `docs/build-order.md` (the granular, checkable expansion of `docs/PRD.md` §13) — don't jump ahead to Phase 2 (bot ingestion) features before Phase 1 (manual add + core embeds + personal boards) is solid. If asked to build something out of that order, flag it rather than silently proceeding. Keep `docs/build-order.md` and `docs/progress.md` in sync with what actually lands — check an item off / add a progress note in the same PR that completes it.
