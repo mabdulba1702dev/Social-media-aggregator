@@ -45,7 +45,7 @@ export function AddPostForm({ boardId }: { boardId: string }) {
         <Input
           value={url}
           onChange={(e) => setUrl(e.target.value)}
-          placeholder="Paste a YouTube, Instagram, X, TikTok, Reddit, Pinterest, Facebook, or Threads link"
+          placeholder="Paste a YouTube, Instagram, X, TikTok, Reddit, Pinterest, Facebook, Threads, or Bluesky link"
           disabled={isPending}
           className="flex-1 border-transparent bg-surface-2 focus-visible:border-accent"
         />

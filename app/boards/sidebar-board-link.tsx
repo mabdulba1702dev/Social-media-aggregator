@@ -12,7 +12,7 @@ export function SidebarBoardLink({ id, name }: { id: string; name: string }) {
     <Link
       href={`/boards/${id}`}
       className={cn(
-        "truncate rounded-lg px-2.5 py-1.5 text-[13.5px]",
+        "truncate rounded-lg px-2.5 py-1.5 text-[13.5px] transition-colors duration-150",
         active ? "bg-accent-soft font-semibold text-accent" : "text-text-muted hover:bg-surface-2 hover:text-text"
       )}
     >

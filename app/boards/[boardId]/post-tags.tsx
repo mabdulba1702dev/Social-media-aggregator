@@ -27,7 +27,7 @@ export function PostTags({ postId, boardId, tags }: { postId: string; boardId: s
       {tags.map((tag) => (
         <span
           key={tag.id}
-          className="inline-flex items-center gap-1 rounded-full bg-accent-soft px-2.5 py-1 text-xs text-accent"
+          className="inline-flex animate-in items-center gap-1 rounded-full bg-accent-soft px-2.5 py-1 text-xs text-accent fade-in duration-200"
         >
           {tag.name}
           <button
@@ -35,7 +35,7 @@ export function PostTags({ postId, boardId, tags }: { postId: string; boardId: s
             aria-label={`Remove tag ${tag.name}`}
             disabled={isPending}
             onClick={() => startTransition(() => removeTag(postId, tag.id, boardId))}
-            className="leading-none text-accent/70 hover:text-accent"
+            className="leading-none text-accent/70 transition-colors duration-150 hover:text-accent"
           >
             ×
           </button>

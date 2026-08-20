@@ -16,7 +16,7 @@ export function BoardRow({ id, name }: { id: string; name: string }) {
     <li className="flex items-center gap-3 rounded-card border border-border bg-surface p-3 shadow-sm">
       <Link
         href={`/boards/${id}`}
-        className="flex-1 truncate text-[14px] font-semibold text-text hover:text-accent hover:underline"
+        className="flex-1 truncate text-[14px] font-semibold text-text transition-colors duration-150 hover:text-accent hover:underline"
       >
         {name}
       </Link>

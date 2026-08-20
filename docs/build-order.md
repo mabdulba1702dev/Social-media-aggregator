@@ -75,7 +75,8 @@ Order matters within the phase — embeds need the provider interface before UI 
 ## Phase 3 — Expansion
 
 - [ ] Bot activity summaries (deferred per PRD §6.4)
-- [ ] LinkedIn, Bluesky, Twitch providers
+- [x] Bluesky provider — same oEmbed pattern as everything else, verified against a real post. `linkedin` and `bluesky` were already in the `posts.platform` check constraint from `0001_init.sql`, so no migration was needed.
+- [ ] LinkedIn (no formal oEmbed — needs its own non-oEmbed integration, see PRD §8), Twitch (clip embeds need a `parent` domain param matching the actual embedding host per-environment — dev/preview/production all differ — deliberately not guessed without a way to verify it actually loads)
 - [ ] Browser extension polish
 - [ ] Notifications (in-app first, per PRD §6.10)
 
