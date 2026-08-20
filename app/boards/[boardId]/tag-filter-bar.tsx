@@ -28,7 +28,7 @@ export function TagFilterBar({
       <Link
         href={hrefFor(null, query)}
         className={cn(
-          "rounded-full px-3 py-1 text-xs font-medium",
+          "rounded-full px-3 py-1 text-xs font-medium transition-colors duration-150",
           activeTagId === null ? "bg-accent text-bg" : "bg-surface-2 text-text-muted hover:text-text"
         )}
       >
@@ -39,7 +39,7 @@ export function TagFilterBar({
           key={tag.id}
           href={hrefFor(tag.id, query)}
           className={cn(
-            "rounded-full px-3 py-1 text-xs font-medium",
+            "rounded-full px-3 py-1 text-xs font-medium transition-colors duration-150",
             activeTagId === tag.id ? "bg-accent text-bg" : "bg-surface-2 text-text-muted hover:text-text"
           )}
         >

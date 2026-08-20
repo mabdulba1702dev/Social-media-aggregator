@@ -1,4 +1,5 @@
 import { PlatformBadge } from "@/components/platform-badge";
+import { EmbedHtml } from "@/components/embed-html";
 import type { Platform } from "@/lib/embed-providers/types";
 import { PostTags } from "./post-tags";
 
@@ -22,7 +23,7 @@ interface Post {
 
 export function PostCard({ post }: { post: Post }) {
   return (
-    <div className="mb-4 break-inside-avoid overflow-hidden rounded-card border border-border bg-surface shadow-sm">
+    <div className="mb-4 animate-in fade-in slide-in-from-bottom-1 break-inside-avoid overflow-hidden rounded-card border border-border bg-surface shadow-sm duration-300">
       <div className="flex items-center gap-2 border-b border-border p-3">
         <PlatformBadge platform={post.platform} />
         {post.author_name && (
@@ -33,7 +34,7 @@ export function PostCard({ post }: { post: Post }) {
       {post.status === "active" && post.embed_html ? (
         // embed_html only ever comes from our own server-side oEmbed fetch
         // (lib/embed-providers/*), never from user-supplied input — safe to render.
-        <div className="embed-body" dangerouslySetInnerHTML={{ __html: post.embed_html }} />
+        <EmbedHtml html={post.embed_html} className="embed-body" />
       ) : (
         <a
           href={post.canonical_url}

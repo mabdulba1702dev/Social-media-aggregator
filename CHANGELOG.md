@@ -10,8 +10,19 @@ the same PR — see `CONTRIBUTING.md`.
 
 ## [Unreleased]
 
+### Added
+
+- Bluesky embed provider (Phase 3, pulled forward) — same oEmbed pattern,
+  verified against a real post.
+
 ### Fixed
 
+- Instagram/X/TikTok/Facebook/Threads/Bluesky embeds were stuck on the
+  static oEmbed fallback forever — `dangerouslySetInnerHTML` never
+  executes injected `<script>` tags, and that script is exactly what
+  hydrates the placeholder into the real widget. Fixed generically for
+  every platform via `components/embed-html.tsx`, which replaces each
+  `<script>` node with a freshly-created one after mount.
 - Board creation could silently double-submit (no pending/loading state
   meant a double-click fired two inserts) — real duplicate boards were
   found on a live account this way. `CreateBoardForm` now uses
@@ -32,6 +43,9 @@ the same PR — see `CONTRIBUTING.md`.
 
 - Create-board and add-post forms now have real visual weight (card
   treatment, prominent button) instead of bare inputs.
+- Added `tailwindcss-animate`; consistent `transition-colors duration-150`
+  across sidebar links, tag chips, inputs, and board links, plus a subtle
+  fade/slide-in on post cards mounting.
 
 - `posts.search_vector`: replaced the expression-based full-text search
   index from `0001_init.sql` with a generated `tsvector` column + index

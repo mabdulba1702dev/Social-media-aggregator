@@ -7,6 +7,7 @@ import { redditProvider } from "./reddit";
 import { pinterestProvider } from "./pinterest";
 import { facebookProvider } from "./facebook";
 import { threadsProvider } from "./threads";
+import { blueskyProvider } from "./bluesky";
 
 export * from "./types";
 
@@ -19,6 +20,7 @@ export const embedProviders: EmbedProvider[] = [
   pinterestProvider,
   facebookProvider,
   threadsProvider,
+  blueskyProvider,
 ];
 
 export function resolveProvider(url: string): EmbedProvider | null {

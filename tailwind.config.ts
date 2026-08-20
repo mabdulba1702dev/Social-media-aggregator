@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import animate from "tailwindcss-animate";
 
 // Tokens mirrored from docs/design-system.md — keep the two in sync.
 const config: Config = {
@@ -34,7 +35,7 @@ const config: Config = {
       }
     }
   },
-  plugins: []
+  plugins: [animate]
 };
 
 export default config;
