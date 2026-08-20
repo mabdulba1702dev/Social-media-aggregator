@@ -62,7 +62,7 @@ Order matters within the phase — embeds need the provider interface before UI 
 > and remain in their original Phase 2 order.
 
 1. [x] **Ingestion pipeline shape** — the shared `pipeline.ts` logic described in `worker/README.md` and the `add-ingestion-source` skill (extract → blocklist → dedup → embed-fetch → insert), built once, used by every source type. Built platform-agnostic; WhatsApp is the first platform wired to it.
-2. [ ] **Telegram bot (webhook)** — `app/api/telegram/route.ts`, no worker infra needed.
+2. [~] **Telegram bot (webhook)** — `app/api/telegram/route.ts` built, secret-token verified (401s without it), verified end-to-end against a real dev server (real URL extraction, real YouTube fetch, real insert, idempotency tracked). Not yet done: registering the webhook with Telegram's `setWebhook` against the real deployed URL, and there's still no UI for connecting a Telegram group to a board — a `sources` row needs to be inserted directly for now, same situation as WhatsApp.
 3. [ ] **Multi-board sharing/permissions** — owner/collaborator/viewer roles, board visibility (private/shared-link/public), before wiring bots into shared boards.
 4. [x] **`worker/` process stood up locally** — npm workspace package, WhatsApp side built (`worker/src/whatsapp.ts`). Not yet deployed to Railway/Fly.io, and Discord's Gateway client isn't built yet.
 5. [ ] **Discord bot (Gateway)** — same pipeline entry point as Telegram.

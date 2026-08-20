@@ -31,3 +31,16 @@ body {
   background-color: var(--bg);
   color: var(--text);
 }
+
+/* Third-party embed widgets (Twitter/X especially) pick their own intrinsic
+   width, often wider than a masonry column — constrain everything inside to
+   the card regardless of what width the platform's own JS decides on. */
+.embed-body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+.embed-body iframe,
+.embed-body blockquote,
+.embed-body img {
+  max-width: 100% !important;
+}

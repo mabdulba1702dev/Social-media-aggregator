@@ -87,6 +87,15 @@ Recommend **private** repo while this is pre-launch.
 1. Open Telegram, message `@BotFather`.
 2. `/newbot` → follow prompts → you get a bot token immediately.
 3. Add the bot to the group you want to ingest from; disable **privacy mode** via BotFather (`/setprivacy` → Disable) so the bot can see all messages, not just commands.
+4. Set `TELEGRAM_BOT_TOKEN` and a random `TELEGRAM_WEBHOOK_SECRET` (any long random string — `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`) in both `.env.local` **and** the Vercel project's environment variables (Preview and Production) — the webhook route (`app/api/telegram/route.ts`) rejects any request that doesn't carry this secret in the `X-Telegram-Bot-Api-Secret-Token` header, so it has to match on both sides.
+5. Once deployed, register the webhook (replace `<TOKEN>`, `<SECRET>`, `<YOUR_DEPLOYED_URL>`):
+   ```bash
+   curl "https://api.telegram.org/bot<TOKEN>/setWebhook" \
+     -d "url=https://<YOUR_DEPLOYED_URL>/api/telegram" \
+     -d "secret_token=<SECRET>"
+   ```
+   Verify it took with `curl "https://api.telegram.org/bot<TOKEN>/getWebhookInfo"`.
+6. Connecting a group to a board: there's no UI for this yet (Phase 1 item, not built) — insert a row into `sources` directly (`platform: 'telegram'`, `external_group_id`: the group's chat ID as a string, e.g. `-1001234567890` — get it from `getWebhookInfo`'s pending updates, or from the bot's own logs once one message comes in and fails to match a source).
 
 **Discord:**
 1. discord.developers.com → New Application.

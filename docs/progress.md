@@ -35,16 +35,17 @@ explicit project-owner request — logged in `docs/PRD.md` §13 and
 Telegram/Discord bot-listener code is unaffected and stays in its original
 Phase 2 slot.
 
-### What's blocking WhatsApp going fully live
+### What's blocking WhatsApp/Telegram going fully live
 
-1. No real `sources` row exists yet linking a WhatsApp group to a board — auth + boards exist now, so this just needs an actual board created by a signed-in user, then a `sources` row inserted (no UI for that yet — direct insert for now).
-2. Worker isn't deployed anywhere yet (Railway/Fly.io) — currently only runnable locally, and stopped when not in active use (see `CLAUDE.md`'s Local Dev Hygiene section).
+1. No real `sources` row exists yet linking a WhatsApp/Telegram group to a board — no UI for connecting a source yet, needs a direct insert for now (see `docs/setup-guide.md` §6 for the exact fields).
+2. **Telegram specifically:** `setWebhook` hasn't been called against a real deployed URL yet — the route works (verified against a local dev server), it's just not registered with Telegram.
+3. **WhatsApp specifically:** worker isn't deployed anywhere yet (Railway/Fly.io) — currently only runnable locally, and stopped when not in active use (see `CLAUDE.md`'s Local Dev Hygiene section).
 
 ### What's blocking the rest of Phase 1
 
 1. Lazy-loading embeds as they scroll into view — the masonry grid exists but renders every embed immediately.
 2. Cross-board search + platform/date filters (current search is per-board, caption/author only — see build-order.md item 9), remaining manual-add paths (extension/share-sheet/bulk-import), deleted/unavailable-post handling.
-3. Real UI polish against `docs/ui-mockup.html` beyond the sidebar/card-treatment pass just done — platform badges in the sidebar, tag chip list, topbar search, empty states, dark mode toggle.
+3. Real UI polish against `docs/ui-mockup.html` beyond the sidebar/card-treatment/logo/transitions passes done so far — tag chip list in the sidebar, topbar search, empty states, dark mode toggle, hero homepage.
 
 ### Resolved
 
@@ -74,3 +75,8 @@ Phase 2 slot.
 - 2026-08-20 — **Fixed a real embed-rendering bug**, found from a user screenshot: Instagram/X (and by the same mechanism, TikTok/Facebook/Threads/Bluesky) oEmbed responses ship a `<script>` tag meant to hydrate a static `<blockquote>` placeholder into the real widget — but `dangerouslySetInnerHTML` never executes injected `<script>` tags (a browser behavior, not a framework bug), so the card was stuck on the static fallback forever. Confirmed by fetching the raw X oEmbed response directly and finding the inert script tag in it. Fixed generically for every platform at once via `components/embed-html.tsx` — replaces each `<script>` node with a freshly-created one after mount, which does execute; a well-known, standard pattern for exactly this problem, not platform-specific guesswork.
 - 2026-08-20 — Added `tailwindcss-animate` and applied consistent `transition-colors duration-150` across previously-inconsistent interactive elements (sidebar links, tag chips/filter bar, inputs, board-row link) plus a subtle fade/slide-in on post cards mounting — direct response to "it looks like we only care about the backend."
 - 2026-08-20 — Bluesky embed provider added (Phase 3, pulled forward) — same oEmbed pattern as the rest, verified against a real post. `bluesky`/`linkedin` were already in the schema's platform constraint, so no migration needed. LinkedIn and Twitch deliberately not built yet — LinkedIn has no formal oEmbed (real integration work, not a quick add), Twitch's clip embed needs a `parent` domain param matching the actual embedding host, which differs across dev/preview/production and isn't something to guess without a way to verify it actually loads.
+- 2026-08-20 — **Ingestion pipeline refactored into shared `lib/ingestion/pipeline.ts`**, parameterized to take a Supabase client instead of constructing its own — `worker/src/pipeline.ts` is now a thin wrapper, and the new Telegram route uses the exact same logic via `lib/supabase/server.ts`'s `createServiceRoleClient()`, instead of two copies of the 8-step pipeline drifting apart.
+- 2026-08-20 — **Telegram webhook built** (Phase 2 item 2, partial): `app/api/telegram/route.ts`, secret-token verified against `X-Telegram-Bot-Api-Secret-Token`. Verified end-to-end against a real dev server: correct 401 without the secret, real URL extraction from a simulated Telegram update, real YouTube oEmbed fetch, real insert, `ingestion_events` correctly marked `processed`. Not yet registered against a real deployed URL (`setWebhook` — see `docs/setup-guide.md` §6) and no UI exists yet to connect a group to a board.
+- 2026-08-20 — Real platform logos: replaced text-initial badges (`IG`, `X`, `TT`, ...) with actual brand SVG marks (paths sourced from `simple-icons`, MIT-licensed, hardcoded rather than installed as a runtime dependency — only 9 icons needed, not worth the package).
+- 2026-08-20 — Fixed a real Twitter/X embed layout bug: the widget defaults to ~550px wide, wider than a masonry column, and overflowed. Added `maxwidth=380` to the oEmbed request (verified the param actually changes the response) plus a CSS safety net in `globals.css` (`.embed-body` constraints) that caps any embed's rendered width regardless of what the platform's own JS decides — covers every provider, not just X.
+- 2026-08-20 — **Fixed a real squash-merge history divergence**: repeatedly branching `dev` → squash-merging to `main` → continuing straight on `dev` eventually produces a real merge conflict (git can't tell the squash commit "contains" dev's own commit history, even though content matches) — hit on PR #8. Fixed by merging `origin/main` back into `dev` after each squash-merge from now on, so `dev`'s history properly includes the squashed commit as an ancestor instead of silently drifting further apart each round.
