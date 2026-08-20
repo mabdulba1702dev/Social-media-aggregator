@@ -14,6 +14,6 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["src/**/*.ts", "../lib/embed-providers/**/*.ts", "../lib/normalize-url.ts"],
+  "include": ["src/**/*.ts", "../lib/embed-providers/**/*.ts", "../lib/normalize-url.ts", "../lib/ingestion/**/*.ts"],
   "exclude": ["node_modules"]
 }

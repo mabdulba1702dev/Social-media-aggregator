@@ -18,6 +18,13 @@ export const xProvider: EmbedProvider = {
     // theoretical edge case. fetchStandardOEmbed already returns
     // `unavailable` on any failure, which is what drives the preview-card
     // fallback state in app/boards/[boardId]/post-card.tsx.
-    return fetchStandardOEmbed(`https://publish.twitter.com/oembed?url=${encodeURIComponent(url)}`);
+    //
+    // maxwidth caps the widget at roughly a masonry column's width so it
+    // doesn't render at Twitter's ~550px default and overflow the card —
+    // globals.css's .embed-body rules are the hard guarantee, this just
+    // avoids the widget looking oversized-then-squished in the meantime.
+    return fetchStandardOEmbed(
+      `https://publish.twitter.com/oembed?url=${encodeURIComponent(url)}&maxwidth=380`
+    );
   },
 };

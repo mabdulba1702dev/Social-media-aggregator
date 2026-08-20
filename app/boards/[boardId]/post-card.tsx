@@ -23,7 +23,7 @@ interface Post {
 
 export function PostCard({ post }: { post: Post }) {
   return (
-    <div className="mb-4 animate-in fade-in slide-in-from-bottom-1 break-inside-avoid overflow-hidden rounded-card border border-border bg-surface shadow-sm duration-300">
+    <div className="mb-4 animate-in fade-in slide-in-from-bottom-1 break-inside-avoid overflow-hidden rounded-card border border-border bg-surface shadow-sm transition-shadow duration-300 hover:shadow-md">
       <div className="flex items-center gap-2 border-b border-border p-3">
         <PlatformBadge platform={post.platform} />
         {post.author_name && (

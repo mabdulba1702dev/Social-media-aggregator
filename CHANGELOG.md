@@ -12,11 +12,27 @@ the same PR — see `CONTRIBUTING.md`.
 
 ### Added
 
+- Telegram webhook (`app/api/telegram/route.ts`), secret-token verified,
+  end-to-end tested against a real dev server. Not yet registered with
+  Telegram's `setWebhook` against a deployed URL — see
+  `docs/setup-guide.md` §6.
+- Real platform logos (brand SVG marks) replacing text-initial badges.
 - Bluesky embed provider (Phase 3, pulled forward) — same oEmbed pattern,
   verified against a real post.
 
+### Changed
+
+- Ingestion pipeline moved to shared `lib/ingestion/pipeline.ts`,
+  parameterized to take a Supabase client — `worker/src/pipeline.ts` and
+  the new Telegram route now share one implementation instead of two.
+
 ### Fixed
 
+- Twitter/X embeds overflowed their masonry column (the widget's ~550px
+  default is wider than a card). Added `maxwidth=380` to the oEmbed
+  request plus a CSS safety net (`globals.css`'s `.embed-body` rules)
+  capping any embed's width regardless of platform — covers every
+  provider, not just X.
 - Instagram/X/TikTok/Facebook/Threads/Bluesky embeds were stuck on the
   static oEmbed fallback forever — `dangerouslySetInnerHTML` never
   executes injected `<script>` tags, and that script is exactly what
