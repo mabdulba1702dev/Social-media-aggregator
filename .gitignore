@@ -27,6 +27,7 @@ next-env.d.ts
 
 # personal learning notes — not team-facing, never committed
 swe.md
+/notes/
 
 # Baileys WhatsApp session — live auth credentials + synced contact data,
 # never commit this under any circumstances (see docs/setup-guide.md §6)
