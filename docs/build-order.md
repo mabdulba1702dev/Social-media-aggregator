@@ -50,7 +50,9 @@ Order matters within the phase — embeds need the provider interface before UI 
 10. [ ] **Remaining manual-add paths** — browser extension, mobile share-sheet, bulk import.
 11. [ ] **Deleted/private source handling** — `status = 'unavailable'` badge path per `docs/database-schema.md`.
 
-**Phase 1 exit criteria:** a single user can sign in, create a board, paste a URL from any of the 8 target platforms, see it render as a live embed (or correct fallback), tag it, and find it again via search.
+**UI polish (cross-cutting, not tied to one numbered item above):** real platform logos (brand SVG marks), hero homepage, persistent sidebar navigation, consistent hover/focus transitions, oEmbed script-hydration fix (Instagram/X/TikTok/Facebook/Threads/Bluesky now render as real widgets, not the static fallback), Twitter/X masonry-column width fix. All human-verified in production via screenshots — see `progress.md`. Still not done: tag chip list in the sidebar, topbar search, empty states, dark mode toggle.
+
+**Phase 1 exit criteria:** a single user can sign in, create a board, paste a URL from any of the 8 target platforms, see it render as a live embed (or correct fallback), tag it, and find it again via search. **This is met** — confirmed end-to-end against real infrastructure and, for the UI half, a real human in a real browser.
 
 ## Phase 2 — Group ingestion
 
