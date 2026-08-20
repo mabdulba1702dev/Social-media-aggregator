@@ -43,6 +43,19 @@ Schema changes touching RLS/security, anything handling secrets, and the
 WhatsApp/Baileys risk surface should still get an explicit human look before
 merging, even though nothing stops them from auto-merging technically.
 
+**Squash-merge + long-lived `dev` needs an explicit sync habit.** Every
+`dev` → `main` merge here is a squash, which means `main`'s resulting commit
+has a *different hash* than the commits that produced it on `dev`, even
+though the content matches — git can't tell it "contains" `dev`'s history.
+Left alone, the next `dev` → `main` PR eventually hits a real merge conflict
+(hit this twice: PR #8 and PR #10). The fix isn't "remember to sync after
+merging" — that's exactly what got skipped both times. Instead: **run
+`git fetch origin && git merge origin/main` into `dev` at the start of each
+new work session**, before writing any new code, not reactively after a
+conflict shows up. A conflict caught proactively (before you've built
+anything else on top) is a two-file fix; caught reactively it can span
+several unrelated docs/changelog entries.
+
 ## Before Opening a PR
 
 ```bash
