@@ -1,5 +1,6 @@
 import { PlatformBadge } from "@/components/platform-badge";
 import { EmbedHtml } from "@/components/embed-html";
+import { LazyMount } from "@/components/lazy-mount";
 import type { Platform } from "@/lib/embed-providers/types";
 import { PostTags } from "./post-tags";
 
@@ -32,9 +33,11 @@ export function PostCard({ post }: { post: Post }) {
       </div>
 
       {post.status === "active" && post.embed_html ? (
-        // embed_html only ever comes from our own server-side oEmbed fetch
-        // (lib/embed-providers/*), never from user-supplied input — safe to render.
-        <EmbedHtml html={post.embed_html} className="embed-body" />
+        <LazyMount>
+          {/* embed_html only ever comes from our own server-side oEmbed fetch
+              (lib/embed-providers/*), never from user-supplied input — safe to render. */}
+          <EmbedHtml html={post.embed_html} className="embed-body" />
+        </LazyMount>
       ) : (
         <a
           href={post.canonical_url}
@@ -44,7 +47,7 @@ export function PostCard({ post }: { post: Post }) {
         >
           {post.embed_thumbnail_url && (
             // eslint-disable-next-line @next/next/no-img-element -- external, per-provider domains; not worth a remotePatterns entry per platform
-            <img src={post.embed_thumbnail_url} alt="" className="rounded-md" />
+            <img src={post.embed_thumbnail_url} alt="" loading="lazy" className="rounded-md" />
           )}
           <span>Preview unavailable — open on {post.platform}</span>
         </a>

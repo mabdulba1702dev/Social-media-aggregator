@@ -6,9 +6,9 @@ item lands or a decision gets made — this is the "what's true right now" doc;
 
 ## Status: Phase 1 nearly complete, human-verified in production
 
-**Last updated:** 2026-08-20
+**Last updated:** 2026-08-21
 
-**Phase completion:** Phase 0: 17/17. Phase 1: 7 done, 2 partial, 2 not started (of 11). Phase 2: 3 done (1 partial), 4 not started (of 8). Phase 3: 1 done (of 4). Phase 4: 0/4. See `build-order.md` for the itemized list.
+**Phase completion:** Phase 0: 17/17. Phase 1: 8 done, 1 partial, 2 not started (of 11). Phase 2: 3 done (1 partial), 4 not started (of 8). Phase 3: 1 done (of 4). Phase 4: 0/4. See `build-order.md` for the itemized list.
 
 ### What's working right now
 
@@ -42,9 +42,8 @@ Phase 2 slot. Bluesky (Phase 3) was also pulled forward, same reasoning.
 
 ### What's blocking the rest of Phase 1
 
-1. Lazy-loading embeds as they scroll into view — the masonry grid exists but renders every embed immediately.
-2. Cross-board search + platform/date filters (current search is per-board, caption/author only — see build-order.md item 9), remaining manual-add paths (extension/share-sheet/bulk-import), deleted/unavailable-post handling.
-3. Real UI polish against `docs/ui-mockup.html` beyond the sidebar/card-treatment/logo/transitions/hero passes done so far — tag chip list in the sidebar, topbar search, empty states, dark mode toggle.
+1. Cross-board search + platform/date filters (current search is per-board, caption/author only — see build-order.md item 9), remaining manual-add paths (extension/share-sheet/bulk-import), deleted/unavailable-post handling.
+2. Real UI polish against `docs/ui-mockup.html` beyond the sidebar/card-treatment/logo/transitions/hero passes done so far — tag chip list in the sidebar, topbar search, empty states, dark mode toggle.
 
 ### Resolved
 
@@ -82,3 +81,4 @@ Phase 2 slot. Bluesky (Phase 3) was also pulled forward, same reasoning.
 - 2026-08-20 — Hero homepage built (`components/hero.tsx`), replacing the bare placeholder. A 21st.dev community hero component turned out to be paywalled, not just API-key gated — hand-built instead using existing design tokens.
 - 2026-08-20 — Investigated browser/computer-use access for real UI testing: no tool available in this session; confirmed Vercel's deployment protection blocks plain fetches against every project URL; configured a Playwright MCP server (browser binary installed, server process confirmed running) but it never bound to this specific session. Concluded this is a session-binding limitation of this environment, not a fixable config issue — continuing with user-provided screenshots, which have already caught every real UI bug this session.
 - 2026-08-20 — Duplicate-board bug confirmed fixed via a real user screenshot of the live "Manage boards" page — exactly one board per name now, sidebar navigation and card treatment rendering correctly in production.
+- 2026-08-21 — Lazy-loading embeds built (Phase 1 item 6, now done). New `components/lazy-mount.tsx` defers each embed's mount via `IntersectionObserver` (400px rootMargin) instead of rendering every card's oEmbed script immediately — a plain skeleton placeholder shows until a card nears the viewport. Also added native `loading="lazy"` to the static-fallback thumbnail `<img>`. Full lint/typecheck/test/build gate verified clean.
