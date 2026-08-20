@@ -12,6 +12,12 @@ the same PR — see `CONTRIBUTING.md`.
 
 ### Added
 
+- Hero homepage (`components/hero.tsx`) for unauthenticated visitors,
+  replacing the bare placeholder. Hand-built using existing design
+  tokens rather than a pulled 21st.dev template (that one turned out
+  to be paywalled, and a generic template would've needed a full
+  re-theme to match `design-system.md`'s "not generic SaaS" stance
+  anyway).
 - Telegram webhook (`app/api/telegram/route.ts`), secret-token verified,
   end-to-end tested against a real dev server. Not yet registered with
   Telegram's `setWebhook` against a deployed URL — see

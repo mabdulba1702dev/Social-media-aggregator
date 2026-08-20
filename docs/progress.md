@@ -45,7 +45,7 @@ Phase 2 slot.
 
 1. Lazy-loading embeds as they scroll into view — the masonry grid exists but renders every embed immediately.
 2. Cross-board search + platform/date filters (current search is per-board, caption/author only — see build-order.md item 9), remaining manual-add paths (extension/share-sheet/bulk-import), deleted/unavailable-post handling.
-3. Real UI polish against `docs/ui-mockup.html` beyond the sidebar/card-treatment/logo/transitions passes done so far — tag chip list in the sidebar, topbar search, empty states, dark mode toggle, hero homepage.
+3. Real UI polish against `docs/ui-mockup.html` beyond the sidebar/card-treatment/logo/transitions/hero passes done so far — tag chip list in the sidebar, topbar search, empty states, dark mode toggle.
 
 ### Resolved
 
@@ -80,3 +80,4 @@ Phase 2 slot.
 - 2026-08-20 — Real platform logos: replaced text-initial badges (`IG`, `X`, `TT`, ...) with actual brand SVG marks (paths sourced from `simple-icons`, MIT-licensed, hardcoded rather than installed as a runtime dependency — only 9 icons needed, not worth the package).
 - 2026-08-20 — Fixed a real Twitter/X embed layout bug: the widget defaults to ~550px wide, wider than a masonry column, and overflowed. Added `maxwidth=380` to the oEmbed request (verified the param actually changes the response) plus a CSS safety net in `globals.css` (`.embed-body` constraints) that caps any embed's rendered width regardless of what the platform's own JS decides — covers every provider, not just X.
 - 2026-08-20 — **Fixed a real squash-merge history divergence**: repeatedly branching `dev` → squash-merging to `main` → continuing straight on `dev` eventually produces a real merge conflict (git can't tell the squash commit "contains" dev's own commit history, even though content matches) — hit on PR #8. Fixed by merging `origin/main` back into `dev` after each squash-merge from now on, so `dev`'s history properly includes the squashed commit as an ancestor instead of silently drifting further apart each round.
+- 2026-08-20 — **Hero homepage built** (`components/hero.tsx`), replacing the bare placeholder unauthenticated visitors previously saw. Attempted a 21st.dev community hero component first (`meschacirung/hero-section-1`) — it turned out to be gated behind a paid tier, not just API-key auth, so hand-built instead using the existing design tokens (avoids the re-theming a generic pulled template would need anyway, and matches `design-system.md`'s explicit "not generic SaaS" stance). Added `lucide-react` for icons. Verified rendering server-side against a real dev server.
