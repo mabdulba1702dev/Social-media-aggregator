@@ -12,6 +12,11 @@ the same PR — see `CONTRIBUTING.md`.
 
 ### Added
 
+- Lazy-mounted embeds (`components/lazy-mount.tsx`): each post card's oEmbed
+  `<script>` now only fetches/executes once the card scrolls near the
+  viewport (`IntersectionObserver`, 400px rootMargin), instead of every
+  embed on a board loading immediately. Shows a skeleton placeholder until
+  then; the static-fallback thumbnail also got native `loading="lazy"`.
 - Hero homepage (`components/hero.tsx`) for unauthenticated visitors,
   replacing the bare placeholder. Hand-built using existing design
   tokens rather than a pulled 21st.dev template (that one turned out
