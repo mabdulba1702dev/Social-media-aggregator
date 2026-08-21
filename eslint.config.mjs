@@ -14,7 +14,16 @@ const eslintConfig = [
   {
     // worker/ is a separate Node package (own tsconfig, no React) — the
     // Next.js/React rule set above doesn't apply to it.
-    ignores: [".next/**", "node_modules/**", "next-env.d.ts", "worker/**"]
+    // The design-canvas export under docs/ ships its own vendored/generated
+    // runtime (support.js, _ds/**) — reference material, not hand-written
+    // app code, and not meant to be edited or linted as if it were.
+    ignores: [
+      ".next/**",
+      "node_modules/**",
+      "next-env.d.ts",
+      "worker/**",
+      "docs/Social media embed aggregator UI/**"
+    ]
   }
 ];
 

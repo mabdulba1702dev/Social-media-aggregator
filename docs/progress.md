@@ -8,7 +8,7 @@ item lands or a decision gets made — this is the "what's true right now" doc;
 
 **Last updated:** 2026-08-21
 
-**Phase completion:** Phase 0: 17/17. Phase 1: 8 done, 1 partial, 2 not started (of 11). Phase 2: 3 done (1 partial), 4 not started (of 8). Phase 3: 1 done (of 4). Phase 4: 0/4. See `build-order.md` for the itemized list.
+**Phase completion:** Phase 0: 17/17. Phase 1: 8 done, 1 partial, 2 not started (of 11). Phase 2: 4 done (1 partial), 3 not started (of 8). Phase 3: 1 done (of 4). Phase 4: 0/4. See `build-order.md` for the itemized list.
 
 ### What's working right now
 
@@ -18,8 +18,9 @@ item lands or a decision gets made — this is the "what's true right now" doc;
 - **Manual URL add**: `/boards/[boardId]`, all 9 embed providers (YouTube, Instagram, X, TikTok, Reddit, Pinterest, Facebook, Threads, Bluesky), tags (add/remove/filter), full-text search (caption/author, per-board), a basic CSS-columns masonry grid.
 - **Real platform logos** (brand SVG marks, not text initials) and **real oEmbed script hydration** — Instagram/X/TikTok/Facebook/Threads/Bluesky embeds actually render as rich widgets now, not stuck on the static fallback (see Recently Completed for the root cause).
 - **Hero homepage** for unauthenticated visitors, replacing the old bare placeholder.
-- **WhatsApp**: worker code built and paired live against a real dedicated number, verified working end-to-end at the connection layer. Not yet wired to a real board (no `sources` row, no UI for connecting one).
-- **Telegram**: webhook built (`app/api/telegram/route.ts`), secret-token verified, end-to-end tested against a real dev server. Not yet registered against a deployed URL (`setWebhook`) or connected to a real board.
+- **Sources UI** (`app/boards/[boardId]/sources/`): connect/rename/pause/disconnect a Telegram/Discord/WhatsApp group against a board, linked from the board page header ("Connected groups →"). Replaces the direct-DB-insert workaround. v1 still requires pasting the platform's raw group/channel ID by hand — no in-app discovery mechanism yet (see `notes/ui-scalability-scope.md` for the "detected but unconnected" staging-table idea this would need).
+- **WhatsApp**: worker code built and paired live against a real dedicated number, verified working end-to-end at the connection layer. Can now be wired to a real board via the sources UI above. Worker itself still only runs locally (see "What's blocking" below).
+- **Telegram**: webhook built (`app/api/telegram/route.ts`), secret-token verified, end-to-end tested against a real dev server. Can now be connected to a real board via the sources UI above. Still not registered against a deployed URL (`setWebhook`).
 - **Infra**: real Supabase project (linked, both migrations pushed), Vercel connected (auto-deploys previews per PR and production on merge to `main`), auto-merge on green CI (branch protection requires the CI check; PRs merge themselves once green), npm workspaces monorepo (`worker/` shares `lib/` with the Next.js app).
 
 ### Known environment limitation
@@ -34,11 +35,38 @@ explicit project-owner request — logged in `docs/PRD.md` §13 and
 Telegram/Discord bot-listener code is unaffected and stays in its original
 Phase 2 slot. Bluesky (Phase 3) was also pulled forward, same reasoning.
 
-### What's blocking WhatsApp/Telegram going fully live
+### Pending visual redesign (2026-08-21, explicit decision, deliberately deferred)
 
-1. No real `sources` row exists yet linking a WhatsApp/Telegram group to a board — no UI for connecting a source yet, needs a direct insert for now (see `docs/setup-guide.md` §6 for the exact fields).
-2. **Telegram specifically:** `setWebhook` hasn't been called against a real deployed URL yet — the route works (verified against a local dev server), it's just not registered with Telegram.
-3. **WhatsApp specifically:** worker isn't deployed anywhere yet (Railway/Fly.io) — currently only runnable locally, and stopped when not in active use (see `CLAUDE.md`'s Local Dev Hygiene section).
+A full interactive mockup was delivered at `docs/Social media embed aggregator UI/`
+(a "Pinboard"-branded design-canvas export: flat/red/zero-radius "Modernist"
+system, Archivo type, grayscale photography — a real departure from the
+shipped warm-neutral system in `docs/design-system.md`). Reviewing it
+surfaced three confirmed-but-not-yet-built decisions:
+1. **Adopt the Modernist system fully** as the new production visual
+   direction (not just borrow its content/flow) — this will mean reskinning
+   every already-shipped screen, including dropping the real platform-logo
+   badges shipped 2026-08-20 in favor of the mockup's plain text tags.
+2. **A new global cross-board "All Posts" feed page**, additive alongside
+   the existing `/boards`/`/boards/[boardId]` pages — the mockup's sidebar
+   "boards nested under a source" turned out, on inspection of its own
+   logic, to just be a tag filter applied to this global view, not a new
+   schema entity. This closes the long-open Phase 1 item 9 cross-board-search
+   gap.
+3. **A per-post Notes feature** (threaded comments in the post detail
+   dialog) — needs a new `post_notes` table + RLS policy, not in the
+   original PRD.
+
+**Explicitly sequenced after bot-ingestion work, per project-owner
+decision** — building sources UI / Telegram-Discord-WhatsApp setup once in
+the current design system, then reskinning, rather than building it twice.
+Logged here rather than silently deferred, per `CLAUDE.md`'s rule. See
+`notes/ui-scalability-scope.md` for more on this once it's picked back up.
+
+### What's blocking WhatsApp/Telegram/Discord going fully live
+
+1. **Telegram specifically:** `setWebhook` hasn't been called against a real deployed URL yet — the route works (verified against a local dev server), it's just not registered with Telegram. Sources UI can connect a group to a board today, but nothing arrives until this is done.
+2. **WhatsApp specifically:** worker isn't deployed anywhere yet (Railway/Fly.io) — currently only runnable locally, and stopped when not in active use (see `CLAUDE.md`'s Local Dev Hygiene section).
+3. **Discord specifically:** worker doesn't exist yet at all (`worker/src/discord.ts` not built, no package chosen). The sources UI accepts a Discord channel ID, but connecting one does nothing until the worker is built.
 
 ### What's blocking the rest of Phase 1
 
@@ -82,3 +110,4 @@ Phase 2 slot. Bluesky (Phase 3) was also pulled forward, same reasoning.
 - 2026-08-20 — Investigated browser/computer-use access for real UI testing: no tool available in this session; confirmed Vercel's deployment protection blocks plain fetches against every project URL; configured a Playwright MCP server (browser binary installed, server process confirmed running) but it never bound to this specific session. Concluded this is a session-binding limitation of this environment, not a fixable config issue — continuing with user-provided screenshots, which have already caught every real UI bug this session.
 - 2026-08-20 — Duplicate-board bug confirmed fixed via a real user screenshot of the live "Manage boards" page — exactly one board per name now, sidebar navigation and card treatment rendering correctly in production.
 - 2026-08-21 — Lazy-loading embeds built (Phase 1 item 6, now done). New `components/lazy-mount.tsx` defers each embed's mount via `IntersectionObserver` (400px rootMargin) instead of rendering every card's oEmbed script immediately — a plain skeleton placeholder shows until a card nears the viewport. Also added native `loading="lazy"` to the static-fallback thumbnail `<img>`. Full lint/typecheck/test/build gate verified clean.
+- 2026-08-21 — Sources UI built (Phase 2 item 6a, new): `app/boards/[boardId]/sources/` — connect/rename/pause/disconnect a Telegram/Discord/WhatsApp group against a board, with per-platform in-form guidance for finding the raw group/channel ID and a friendly "already connected to a board" message on the `unique(platform, external_group_id)` conflict. Replaces the direct-DB-insert workaround `setup-guide.md` previously documented for both Telegram and WhatsApp (both docs updated to point at the new page). `eslint.config.mjs` also updated to ignore the newly-added design-canvas export under `docs/` (its vendored `support.js`/`_ds_bundle.js` aren't hand-written app code and shouldn't be linted as if they were). Full lint/typecheck/test/build gate verified clean.
