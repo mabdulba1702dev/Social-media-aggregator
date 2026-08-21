@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/modernist-e70b4432-9de9-4106-8989-9c2001eedd97/styles.css">
+<script src="_ds/modernist-e70b4432-9de9-4106-8989-9c2001eedd97/_ds_bundle.js"></script>
+<style>
+@keyframes pbPulse{0%{opacity:.35}50%{opacity:1}100%{opacity:.35}}
+@keyframes pbFadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes pbMarquee{from{transform:translateY(0)}to{transform:translateY(-50%)}}
+html,body{margin:0;height:100%}
+a{color:var(--color-accent);text-decoration:none}
+a:hover{color:var(--color-accent-700)}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:var(--color-neutral-300)}
+</style>
+</helmet>
+
+<div style="display:flex;height:100vh;width:100%;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);overflow:hidden;transition:background-color .3s ease,color .3s ease;{{ themeVars }}">
+
+<sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:50;background:var(--color-text);color:var(--color-bg);padding:10px 18px;font-size:13px;font-family:var(--font-heading);font-weight:800;box-shadow:var(--shadow-lg)">{{ toast }}</div>
+</sc-if>
+
+<sc-if value="{{ isSignin }}" hint-placeholder-val="{{ true }}">
+  <div style="flex:1;display:flex;overflow:hidden;animation:pbFadeIn .4s ease">
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 72px;max-width:500px;gap:var(--space-4);position:relative">
+      <div class="nav-brand" style="font-size:22px">PINBOARD</div>
+      <h1 style="margin:0;font-size:38px;line-height:1.08">Every link your friends send, in one board.</h1>
+      <p class="text-muted" style="font-size:15px;margin:0;max-width:400px">Add the bot to a WhatsApp, Telegram, or Discord group — every link shared there lands here automatically, sorted and searchable.</p>
+      <button class="btn btn-primary" style="justify-content:flex-start;gap:10px;padding:13px 18px;font-size:14px;margin-top:var(--space-2);transition:transform .15s ease" style-active="transform:scale(.97)" onClick="{{ signIn }}">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.4 0 6.4 1.2 8.8 3.5l6.5-6.5C35.3 2.7 30 0 24 0 14.6 0 6.5 5.4 2.6 13.3l7.6 5.9C12.3 13.6 17.6 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.4 5.7c4.3-4 6.8-9.9 6.8-17.4z"/><path fill="#FBBC05" d="M10.2 19.2C9.6 21 9.2 22.9 9.2 24.9s.4 3.9 1 5.7l-7.6 5.9C1 32.7 0 28.9 0 24.9s1-7.8 2.6-10.9l7.6 5.2z"/><path fill="#34A853" d="M24 49.9c6 0 11.3-2 15.1-5.6l-7.4-5.7c-2.1 1.4-4.7 2.2-7.7 2.2-6.4 0-11.7-4.1-13.7-9.7l-7.6 5.9C6.5 44.5 14.6 49.9 24 49.9z"/></svg>
+        Continue with Google
+      </button>
+      <button class="btn btn-secondary" style="justify-content:flex-start;gap:10px;padding:13px 18px;font-size:14px" onClick="{{ goHow }}">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+        See how it works first
+      </button>
+      <button onClick="{{ signIn }}" style="border:none;background:none;text-align:left;cursor:pointer;font-size:13px;padding:0;color:var(--color-neutral-600);font-family:var(--font-body)">Continue as guest →</button>
+    </div>
+    <div style="flex:1;position:relative;overflow:hidden;border-left:2px solid var(--color-divider);background:var(--color-surface);display:flex;gap:12px;padding:12px">
+      <sc-for list="{{ marqueeCols }}" as="col" hint-placeholder-count="3">
+        <div style="flex:1;overflow:hidden;position:relative">
+          <div style="display:flex;flex-direction:column;gap:12px;animation:pbMarquee {{ col.duration }}s linear infinite;animation-direction:{{ col.direction }}" style-hover="animation-play-state:paused">
+            <sc-for list="{{ col.imgs }}" as="imgUrl" hint-placeholder-count="12">
+              <img src="{{ imgUrl }}" class="grayscale" style="width:100%;height:220px;object-fit:cover;display:block"/>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ isAppShell }}" hint-placeholder-val="{{ false }}">
+
+<aside style="width:{{ sidebarWidth }}px;flex:0 0 {{ sidebarWidth }}px;border-right:2px solid var(--color-divider);display:flex;flex-direction:column;padding:var(--space-4) {{ sidebarPad }}px;gap:var(--space-4);overflow-y:auto;overflow-x:hidden;position:relative;transition:width .38s cubic-bezier(.16,1,.3,1),padding .38s cubic-bezier(.16,1,.3,1),border-color .3s ease">
+
+  <button onClick="{{ toggleSidebar }}" title="Collapse sidebar" style="position:absolute;top:14px;right:-13px;width:26px;height:26px;border-radius:50%;background:var(--color-surface);border:1px solid var(--color-divider);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:5;padding:0;transition:background-color .3s ease">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transition:transform .38s cubic-bezier(.16,1,.3,1);transform:rotate({{ chevronRotate }}deg)"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+
+  <button style="{{ homeBtnStyle }}" onClick="{{ goHome }}" title="All Posts">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M3 9.5L12 3l9 6.5V21a1 1 0 01-1 1h-5v-7H9v7H4a1 1 0 01-1-1z"/></svg>
+    <sc-if value="{{ isSidebarExpanded }}" hint-placeholder-val="{{ true }}"><span>All Posts</span></sc-if>
+  </button>
+
+  <div style="{{ expandedContentStyle }}">
+    <div>
+      <h6 style="margin:0 0 var(--space-2);color:var(--color-neutral-600);white-space:nowrap">Sources</h6>
+      <div style="display:flex;flex-direction:column;gap:2px">
+        <sc-for list="{{ sourcesWithState }}" as="src" hint-placeholder-count="6">
+          <div style="animation:pbFadeIn .3s ease backwards;animation-delay:{{ src.rowDelay }}ms">
+            <button onClick="{{ src.toggle }}" style="width:100%;display:flex;align-items:center;gap:8px;background:transparent;border:none;padding:7px 4px;cursor:pointer;text-align:left;font-family:var(--font-body);color:var(--color-text);transition:background-color .2s ease">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;transition:transform .32s cubic-bezier(.16,1,.3,1);transform:rotate({{ src.caretRotate }}deg)"><polyline points="9 6 15 12 9 18"/></svg>
+              <span class="tag tag-neutral" style="flex:none">{{ src.platform }}</span>
+              <span style="font-size:13px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ src.name }}</span>
+              <span style="font-size:11px;color:var(--color-neutral-600)">{{ src.count }}</span>
+            </button>
+            <div style="display:grid;grid-template-rows:{{ src.boardsRows }};transition:grid-template-rows .32s cubic-bezier(.16,1,.3,1);overflow:hidden">
+              <div style="min-height:0;overflow:hidden;display:flex;flex-direction:column;padding-left:26px">
+                <sc-for list="{{ src.boards }}" as="board" hint-placeholder-count="2">
+                  <button onClick="{{ board.select }}" style="display:flex;justify-content:space-between;background:transparent;border:none;padding:5px 4px;cursor:pointer;text-align:left;font-family:var(--font-body);font-size:12.5px;color:var(--color-neutral-700);transition:color .2s ease,opacity .25s ease,transform .25s ease;opacity:{{ src.boardsOpacity }};transform:translateX({{ src.boardsShift }}px)">
+                    <span>{{ board.name }}</span>
+                    <span style="color:var(--color-neutral-500)">{{ board.count }}</span>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div class="hr" style="margin:0"></div>
+
+    <div>
+      <h6 style="margin:0 0 var(--space-2);color:var(--color-neutral-600);white-space:nowrap">Tags</h6>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <sc-for list="{{ tagsWithState }}" as="tg" hint-placeholder-count="8">
+          <button onClick="{{ tg.select }}" class="{{ tg.className }}" style="border:none;cursor:pointer;font-family:var(--font-body);transition:background-color .2s ease,color .2s ease,transform .15s ease" style-active="transform:scale(.94)">{{ tg.name }}</button>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div style="{{ collapsedContentStyle }}">
+    <sc-for list="{{ sourcesWithState }}" as="src" hint-placeholder-count="6">
+      <div title="{{ src.name }}" style="width:32px;height:32px;border-radius:50%;background:var(--color-neutral-200);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-weight:800;font-size:12px;flex:none;transition:background-color .3s ease,transform .2s ease" style-hover="transform:scale(1.1)">{{ src.initial }}</div>
+    </sc-for>
+  </div>
+
+  <div style="flex:1"></div>
+  <div class="hr" style="margin:0"></div>
+  <button class="btn btn-secondary" onClick="{{ goSettings }}" title="Connect a group" style="{{ connectBtnStyle }}">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    <sc-if value="{{ isSidebarExpanded }}" hint-placeholder-val="{{ true }}"><span>Connect a group</span></sc-if>
+  </button>
+</aside>
+
+<div style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0">
+
+  <div class="nav" style="transition:border-color .3s ease;flex-wrap:wrap;row-gap:8px">
+    <div class="nav-brand" style="flex:none">PINBOARD</div>
+    <div style="display:flex;gap:8px;flex:1 1 200px;min-width:160px;max-width:{{ ingestMaxWidth }};transition:max-width .25s cubic-bezier(.16,1,.3,1);position:relative">
+      <div style="position:relative;flex:1">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:11px;top:50%;transform:translateY(-50%) rotate({{ linkIconRotate }}deg);transition:transform .3s cubic-bezier(.34,1.56,.64,1);color:var(--color-neutral-500);pointer-events:none"><path d="M10 13a5 5 0 007.07 0l1.93-1.93a5 5 0 00-7.07-7.07L10.5 5.5"/><path d="M14 11a5 5 0 00-7.07 0L5 12.93a5 5 0 007.07 7.07L13.5 18.5"/></svg>
+        <input class="input" style="padding-left:32px;width:100%" placeholder="{{ ingestPlaceholder }}" value="{{ ingestUrl }}" onChange="{{ onIngestChange }}" onKeyDown="{{ onIngestKeyDown }}" onFocus="{{ onIngestFocus }}" onBlur="{{ onIngestBlur }}"/>
+      </div>
+      <button class="btn btn-primary" onClick="{{ submitIngest }}" style="flex:none;transition:transform .15s ease" style-active="transform:scale(.95)">Save</button>
+    </div>
+    <div style="display:flex;gap:2px;margin-left:auto;border:1px solid var(--color-divider);flex:none">
+      <button style="{{ feedBtnStyle }}" onClick="{{ goFeed }}" title="Feed"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></button>
+      <button style="{{ searchBtnStyle }}" onClick="{{ goSearch }}" title="Search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+      <button style="{{ howBtnStyle }}" onClick="{{ goHow }}" title="How it works"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></button>
+      <button style="{{ profileBtnStyle }}" onClick="{{ goProfile }}" title="Profile"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></button>
+      <button style="{{ settingsBtnStyle }}" onClick="{{ goSettings }}" title="Settings"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82 2 2 0 11-2.83 2.83 1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51 2 2 0 11-4 0 1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33 2 2 0 11-2.83-2.83A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1 2 2 0 110-4A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82 2 2 0 112.83-2.83A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51 2 2 0 114 0 1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33 2 2 0 112.83 2.83A1.65 1.65 0 0019.4 9c.23.5.7.85 1.51 1a2 2 0 110 4c-.81.15-1.28.5-1.51 1z"/></svg></button>
+      <button style="{{ emptyBtnStyle }}" onClick="{{ goEmpty }}" title="Empty state demo"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg></button>
+      <button style="{{ signinBtnStyle }}" onClick="{{ goSignin }}" title="Sign out / sign-in screen"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg></button>
+    </div>
+    <button class="btn btn-icon btn-secondary" onClick="{{ toggleTheme }}" style="flex:none" title="Toggle theme">
+      <sc-if value="{{ isDark }}" hint-placeholder-val="{{ false }}">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      </sc-if>
+      <sc-if value="{{ isLight }}" hint-placeholder-val="{{ true }}">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.9" y1="4.9" x2="6.3" y2="6.3"/><line x1="17.7" y1="17.7" x2="19.1" y2="19.1"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.9" y1="19.1" x2="6.3" y2="17.7"/><line x1="17.7" y1="6.3" x2="19.1" y2="4.9"/></svg>
+      </sc-if>
+    </button>
+    <button onClick="{{ goProfile }}" style="flex:none;width:36px;height:36px;padding:0;border:none;cursor:pointer;overflow:hidden;background:var(--color-neutral-300)">
+      <img src="assets/photo-6.jpg" class="grayscale" style="width:100%;height:100%;object-fit:cover;display:block"/>
+    </button>
+  </div>
+
+  <div style="flex:1;overflow-y:auto;padding:var(--space-6);position:relative;transition:background-color .3s ease">
+
+    <sc-if value="{{ isFeed }}" hint-placeholder-val="{{ true }}">
+      <div style="animation:pbFadeIn .35s ease">
+        <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:var(--space-4)">
+          <h2 style="margin:0">All Posts</h2>
+          <span style="color:var(--color-neutral-600);font-size:13px">{{ feedCountLabel }}</span>
+        </div>
+        <sc-if value="{{ hasActiveTags }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:var(--space-4);animation:pbFadeIn .2s ease">
+            <sc-for list="{{ activeTagChips }}" as="chip" hint-placeholder-count="1">
+              <button onClick="{{ chip.remove }}" class="tag tag-accent" style="border:none;cursor:pointer;display:flex;gap:6px;align-items:center;transition:transform .15s ease" style-hover="transform:translateY(-1px)">
+                {{ chip.name }}
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </sc-for>
+            <button onClick="{{ clearTag }}" class="tag tag-outline" style="border:none;cursor:pointer">Clear all</button>
+          </div>
+        </sc-if>
+        <div style="column-count:4;column-gap:var(--space-4)">
+          <sc-for list="{{ feedPosts }}" as="post" hint-placeholder-count="18">
+            <dc-import name="PostCard" post="{{ post }}" hint-size="100%,300px"></dc-import>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isSearch }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:pbFadeIn .35s ease">
+        <div style="margin-bottom:var(--space-4)">
+          <div style="display:flex;gap:8px;max-width:480px;margin-bottom:var(--space-3)">
+            <input class="input" value="{{ searchQuery }}" onChange="{{ onSearchChange }}" placeholder="Search captions and tags…"/>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:12px">
+            <h2 style="margin:0">Results for "{{ searchQuery }}"</h2>
+            <span style="color:var(--color-neutral-600);font-size:13px">{{ searchCountLabel }}</span>
+          </div>
+        </div>
+        <div style="column-count:4;column-gap:var(--space-4)">
+          <sc-for list="{{ searchPosts }}" as="post" hint-placeholder-count="3">
+            <dc-import name="PostCard" post="{{ post }}" hint-size="100%,300px"></dc-import>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:780px;animation:pbFadeIn .35s ease">
+        <h2 style="margin:0 0 var(--space-4)">Connected groups</h2>
+        <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+          <sc-for list="{{ sourcesWithState }}" as="src" hint-placeholder-count="6">
+            <div class="card elev-sm" style="flex-direction:row;align-items:center;gap:var(--space-4)">
+              <span class="tag tag-neutral" style="flex:none">{{ src.platform }}</span>
+              <div style="flex:1">
+                <div class="card-title" style="font-size:15px">{{ src.name }}</div>
+                <div class="text-muted" style="font-size:12px">{{ src.connectMethod }}</div>
+              </div>
+              <span class="tag tag-accent" style="flex:none">Connected</span>
+              <span class="text-muted" style="font-size:12px;flex:none">{{ src.lastActive }}</span>
+              <button class="btn btn-ghost" style="flex:none">Rename</button>
+              <button class="btn btn-ghost" style="flex:none;color:var(--color-neutral-600)">Disconnect</button>
+            </div>
+          </sc-for>
+        </div>
+
+        <div class="hr"></div>
+        <h3 style="margin:0 0 var(--space-3)">Add a new source</h3>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4)">
+          <div class="card elev-sm">
+            <span class="card-kicker">WhatsApp</span>
+            <div class="card-title" style="font-size:15px">Add the Pinboard number</div>
+            <p class="card-body">1. Add +1 (555) 019-9021 to your group. 2. Send /connect. 3. Forwarded links appear here automatically.</p>
+            <button class="btn btn-secondary btn-block">Get invite link</button>
+          </div>
+          <div class="card elev-sm">
+            <span class="card-kicker">Telegram</span>
+            <div class="card-title" style="font-size:15px">Invite @PinboardCollectorBot</div>
+            <p class="card-body">1. Add the bot to your group. 2. Send /connect. 3. Approve read access to shared links.</p>
+            <button class="btn btn-secondary btn-block">Get invite link</button>
+          </div>
+          <div class="card elev-sm">
+            <span class="card-kicker">Discord</span>
+            <div class="card-title" style="font-size:15px">Invite the Pinboard bot</div>
+            <p class="card-body">1. Authorize the bot for your server. 2. Run /pinboard connect. 3. Pick which channels to watch.</p>
+            <button class="btn btn-secondary btn-block">Get invite link</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+      <div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:var(--space-3);max-width:420px;margin:0 auto;animation:pbFadeIn .35s ease">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-neutral-400)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 011 1v17l-7-4-7 4V4a1 1 0 011-1z"/></svg>
+        <h3 style="margin:0">No posts yet</h3>
+        <p class="text-muted" style="margin:0">Send a link to a connected WhatsApp, Telegram, or Discord group and the bot will pin it here automatically.</p>
+        <button class="btn btn-primary" onClick="{{ goSettings }}" style="margin-top:var(--space-2)">Connect your first group</button>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isHow }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:640px;animation:pbFadeIn .35s ease">
+        <h2 style="margin:0 0 var(--space-2)">How Pinboard works</h2>
+        <p class="text-muted" style="margin:0 0 var(--space-5)">Four steps, no copy-pasting into an app.</p>
+        <div style="display:flex;flex-direction:column">
+          <sc-for list="{{ howSteps }}" as="step" hint-placeholder-count="4">
+            <div style="display:flex;gap:var(--space-4)">
+              <div style="display:flex;flex-direction:column;align-items:center;flex:none">
+                <div style="{{ step.circleStyle }}">
+                  <sc-if value="{{ step.isConnect }}" hint-placeholder-val="{{ false }}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 4L3 11l6.5 2.5M20 4l-7 17-3.5-8.5M20 4l-10.5 9.5"/></svg>
+                  </sc-if>
+                  <sc-if value="{{ step.isShare }}" hint-placeholder-val="{{ false }}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.07 0l1.93-1.93a5 5 0 00-7.07-7.07L10.5 5.5"/><path d="M14 11a5 5 0 00-7.07 0L5 12.93a5 5 0 007.07 7.07L13.5 18.5"/></svg>
+                  </sc-if>
+                  <sc-if value="{{ step.isSort }}" hint-placeholder-val="{{ false }}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                  </sc-if>
+                  <sc-if value="{{ step.isFind }}" hint-placeholder-val="{{ false }}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  </sc-if>
+                </div>
+                <sc-if value="{{ step.hasLine }}" hint-placeholder-val="{{ true }}">
+                  <div style="width:2px;flex:1;background:var(--color-divider);min-height:36px;transition:background-color .3s ease"></div>
+                </sc-if>
+              </div>
+              <div style="padding-bottom:var(--space-5);flex:1">
+                <div style="{{ step.titleStyle }}">{{ step.title }}</div>
+                <p class="text-muted" style="margin:6px 0 0;font-size:13.5px">{{ step.desc }}</p>
+                <div style="height:2px;background:var(--color-neutral-200);margin-top:10px;overflow:hidden;width:120px">
+                  <div style="{{ step.progressStyle }}"></div>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <button class="btn btn-primary" onClick="{{ goSettings }}" style="margin-top:var(--space-2)">Connect your first group</button>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:900px;animation:pbFadeIn .35s ease">
+        <div style="display:flex;gap:var(--space-4);align-items:flex-start;margin-bottom:var(--space-4)">
+          <img src="assets/photo-6.jpg" class="grayscale" style="width:96px;height:96px;object-fit:cover;flex:none"/>
+          <div style="flex:1">
+            <h2 style="margin:0">Riya Chen</h2>
+            <div class="text-muted" style="font-size:13px;margin-bottom:6px">@riyachen · joined March 2025</div>
+            <p style="margin:0;font-size:14px;max-width:480px">Collects design references, food, and travel finds from six group chats into one board.</p>
+          </div>
+          <button class="btn btn-secondary" style="flex:none">Edit profile</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-3);margin-bottom:var(--space-4)">
+          <div class="card elev-sm">
+            <span class="card-kicker">Posts</span>
+            <div class="card-title">{{ profileStats.posts }}</div>
+          </div>
+          <div class="card elev-sm">
+            <span class="card-kicker">Boards</span>
+            <div class="card-title">{{ profileStats.boards }}</div>
+          </div>
+          <div class="card elev-sm">
+            <span class="card-kicker">Sources</span>
+            <div class="card-title">{{ profileStats.sources }}</div>
+          </div>
+          <div class="card elev-sm">
+            <span class="card-kicker">Total saves</span>
+            <div class="card-title">{{ profileStats.saves }}</div>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+        <h4 style="margin:0 0 var(--space-3)">Connected groups</h4>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:var(--space-4)">
+          <sc-for list="{{ sourcesWithState }}" as="src" hint-placeholder-count="6">
+            <span class="tag tag-neutral" style="display:flex;gap:6px">{{ src.platform }} · {{ src.name }}</span>
+          </sc-for>
+        </div>
+
+        <h4 style="margin:0 0 var(--space-3)">Recently saved</h4>
+        <div style="column-count:4;column-gap:var(--space-4)">
+          <sc-for list="{{ profilePosts }}" as="post" hint-placeholder-count="8">
+            <dc-import name="PostCard" post="{{ post }}" hint-size="100%,300px"></dc-import>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+  </div>
+</div>
+
+</sc-if>
+
+<sc-if value="{{ selectedPost }}" hint-placeholder-val="{{ false }}">
+  <div class="dialog-backdrop" onClick="{{ closePost }}">
+    <div class="dialog" style="width:min(560px,100%)" onClick="{{ stopProp }}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div class="dialog-title">{{ selectedPost.caption }}</div>
+        <button class="btn btn-icon btn-ghost" onClick="{{ closePost }}">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div style="height:280px;background:{{ selectedPost.bg }};overflow:hidden">
+        <img src="{{ selectedPost.img }}" class="grayscale" style="width:100%;height:100%;object-fit:cover;display:block"/>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <span class="tag tag-neutral">{{ selectedPost.platformLabel }}</span>
+        <span class="text-muted" style="font-size:13px">from {{ selectedPost.sourceName }}</span>
+        <span class="text-muted" style="font-size:13px">· shared by {{ selectedPost.sender }}</span>
+        <span class="text-muted" style="font-size:13px">· {{ selectedPost.timeAgo }}</span>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <sc-for list="{{ selectedPost.tags }}" as="t" hint-placeholder-count="2">
+          <span class="tag tag-outline">{{ t }}</span>
+        </sc-for>
+      </div>
+      <div class="hr" style="margin:var(--space-1) 0"></div>
+      <div>
+        <h6 style="color:var(--color-neutral-600);margin:0 0 var(--space-2)">Notes</h6>
+        <div style="display:flex;flex-direction:column;gap:var(--space-2);max-height:140px;overflow-y:auto">
+          <sc-for list="{{ selectedPost.notes }}" as="note" hint-placeholder-count="1">
+            <div style="font-size:13px"><strong>{{ note.author }}</strong> — {{ note.text }}</div>
+          </sc-for>
+          <sc-if value="{{ selectedPost.noNotes }}" hint-placeholder-val="{{ false }}">
+            <div class="text-muted" style="font-size:13px">No notes yet.</div>
+          </sc-if>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:var(--space-2)">
+          <input class="input" placeholder="Add a note…" value="{{ noteDraft }}" onChange="{{ onNoteDraftChange }}" onKeyDown="{{ onNoteKeyDown }}"/>
+          <button class="btn btn-icon btn-secondary" onClick="{{ addNote }}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="dialog-actions">
+        <a href="#" class="btn btn-secondary">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Open on {{ selectedPost.platformLabel }}
+        </a>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const SOURCES = [
+  { id:'ws-design', platform:'WhatsApp', name:'Design Inspo Squad', count:214, connectMethod:'Forward links to +1 (555) 019-9021', lastActive:'12m ago',
+    boards:[{name:'UI/UX',count:82},{name:'Typography',count:41},{name:'Branding',count:37}] },
+  { id:'ws-foodie', platform:'WhatsApp', name:'Foodie Friends', count:96, connectMethod:'Forward links to +1 (555) 019-9021', lastActive:'3h ago',
+    boards:[{name:'Recipes',count:58},{name:'Kitchen Gear',count:12}] },
+  { id:'tg-deals', platform:'Telegram', name:'Deal Alerts', count:340, connectMethod:'Added @PinboardCollectorBot · /connect', lastActive:'40m ago',
+    boards:[{name:'Deals',count:210},{name:'Travel',count:44}] },
+  { id:'tg-travel', platform:'Telegram', name:'Travel Junkies', count:152, connectMethod:'Added @PinboardCollectorBot · /connect', lastActive:'1d ago',
+    boards:[{name:'Travel',count:98},{name:'Recipes',count:9}] },
+  { id:'dc-devmemes', platform:'Discord', name:'Dev Memes', count:401, connectMethod:'Bot invited · /pinboard connect', lastActive:'6m ago',
+    boards:[{name:'Tech',count:120},{name:'Funny',count:190}] },
+  { id:'dc-wallpaper', platform:'Discord', name:'Wallpaper Vault', count:88, connectMethod:'Bot invited · /pinboard connect', lastActive:'2h ago',
+    boards:[{name:'Wallpapers',count:70},{name:'UI/UX',count:9}] },
+];
+
+const TAGS = ['UI/UX','Typography','Recipes','Travel','Funny','Tech','Deals','Wallpapers','Branding'];
+const PLACEHOLDERS = ['Paste a link to save it…','Try an Instagram reel URL…','Try a TikTok link…','Paste a tweet or article link…'];
+
+const SHADES = ['var(--color-neutral-200)','var(--color-neutral-300)','var(--color-neutral-400)'];
+
+const RAW_POSTS = [
+  {id:1,caption:'Minimalist workspace setup',tags:['UI/UX'],platformLabel:'Instagram',sourceName:'Design Inspo Squad',sender:'Amara',timeAgo:'2h ago',saves:128,kind:'image',h:320},
+  {id:2,caption:'Homemade pasta from scratch',tags:['Recipes'],platformLabel:'TikTok',sourceName:'Foodie Friends',sender:'Priya',timeAgo:'5h ago',saves:342,kind:'video',h:400},
+  {id:3,caption:'Neon wallpaper pack, 8 shots',tags:['Wallpapers'],platformLabel:'Instagram',sourceName:'Wallpaper Vault',sender:'kai_dev',timeAgo:'1d ago',saves:87,kind:'carousel',h:260},
+  {id:4,caption:'Flash sale on studio headphones',tags:['Deals'],platformLabel:'X',sourceName:'Deal Alerts',sender:'DealBot',timeAgo:'3h ago',saves:54,kind:'article',h:220},
+  {id:5,caption:'React server components, explained',tags:['Tech'],platformLabel:'X',sourceName:'Dev Memes',sender:'littlebyte',timeAgo:'8h ago',saves:210,kind:'article',h:300},
+  {id:6,caption:'Kyoto backstreets in autumn',tags:['Travel'],platformLabel:'Instagram',sourceName:'Travel Junkies',sender:'Noah',timeAgo:'1d ago',saves:176,kind:'image',h:360},
+  {id:7,caption:'Type pairing inspiration board',tags:['Typography','UI/UX'],platformLabel:'Instagram',sourceName:'Design Inspo Squad',sender:'Amara',timeAgo:'2d ago',saves:96,kind:'image',h:280},
+  {id:8,caption:'This dance trend again',tags:['Funny'],platformLabel:'TikTok',sourceName:'Dev Memes',sender:'reallynotabot',timeAgo:'4h ago',saves:512,kind:'video',h:340},
+  {id:9,caption:"Grandma's kimchi jjigae",tags:['Recipes'],platformLabel:'YouTube',sourceName:'Foodie Friends',sender:'Priya',timeAgo:'1d ago',saves:143,kind:'image',h:300},
+  {id:10,caption:'Retro desktop icon set',tags:['Wallpapers','UI/UX'],platformLabel:'Instagram',sourceName:'Wallpaper Vault',sender:'kai_dev',timeAgo:'2d ago',saves:65,kind:'carousel',h:240},
+  {id:11,caption:'Flight deal to Lisbon, $312rt',tags:['Deals','Travel'],platformLabel:'Telegram',sourceName:'Deal Alerts',sender:'DealBot',timeAgo:'6h ago',saves:88,kind:'article',h:260},
+  {id:12,caption:'CSS grid cheat sheet',tags:['Tech','UI/UX'],platformLabel:'X',sourceName:'Dev Memes',sender:'littlebyte',timeAgo:'9h ago',saves:301,kind:'image',h:320},
+  {id:13,caption:'Street food night market',tags:['Travel','Recipes'],platformLabel:'TikTok',sourceName:'Travel Junkies',sender:'Noah',timeAgo:'2d ago',saves:189,kind:'video',h:380},
+  {id:14,caption:'Branding moodboard, v3',tags:['Branding','UI/UX'],platformLabel:'Instagram',sourceName:'Design Inspo Squad',sender:'Amara',timeAgo:'3d ago',saves:74,kind:'image',h:300},
+  {id:15,caption:'Cat vs. vacuum, round two',tags:['Funny'],platformLabel:'TikTok',sourceName:'Dev Memes',sender:'reallynotabot',timeAgo:'11h ago',saves:623,kind:'video',h:260},
+  {id:16,caption:'Minimalist poster set',tags:['Wallpapers','Branding'],platformLabel:'Instagram',sourceName:'Wallpaper Vault',sender:'kai_dev',timeAgo:'4d ago',saves:112,kind:'carousel',h:340},
+  {id:17,caption:'One-pan dinner ideas',tags:['Recipes'],platformLabel:'YouTube',sourceName:'Foodie Friends',sender:'Priya',timeAgo:'5d ago',saves:158,kind:'image',h:280},
+  {id:18,caption:'Budget backpacking gear list',tags:['Travel','Deals'],platformLabel:'Telegram',sourceName:'Deal Alerts',sender:'DealBot',timeAgo:'6d ago',saves:47,kind:'article',h:220},
+];
+
+const HOW_STEPS = [
+  { key:'connect', title:'Add the bot to a group', desc:'Invite Pinboard to any WhatsApp, Telegram, or Discord group in a few taps — no setup, no accounts for the group members.' },
+  { key:'share', title:'Share links like you normally do', desc:'Anyone in the group pastes a reel, tweet, article, or video link into the chat, same as always.' },
+  { key:'sort', title:'The bot saves and sorts it', desc:'Pinboard detects the link, pulls a preview, and files it under that group\u2019s board and any matching tags.' },
+  { key:'find', title:'Find it anytime, filtered your way', desc:'Browse by source, tag, or search \u2014 everything your group ever shared, organized automatically.' },
+];
+
+const NOTES_SEED = {
+  1: [{author:'Jordan', text:'Saving this for the new apartment.'}],
+  6: [{author:'Sam', text:'Adding this to the itinerary.'}],
+};
+
+const LIGHT_VARS = '--color-bg:#f3f2f2;--color-surface:#eae9e9;--color-text:#201e1d;--color-divider:color-mix(in srgb, #201e1d 40%, transparent);--color-neutral-100:#f8f4f4;--color-neutral-200:#eae7e7;--color-neutral-300:#d7d3d3;--color-neutral-400:#bab6b6;--color-neutral-500:#9b9797;--color-neutral-600:#7d7979;--color-neutral-700:#605d5d;--color-neutral-800:#444141;--color-neutral-900:#2d2b2b;';
+const DARK_VARS = '--color-bg:#1c1a1a;--color-surface:#272424;--color-text:#f3f2f2;--color-divider:color-mix(in srgb, #f3f2f2 30%, transparent);--color-neutral-100:#2d2b2b;--color-neutral-200:#444141;--color-neutral-300:#605d5d;--color-neutral-400:#7d7979;--color-neutral-500:#9b9797;--color-neutral-600:#bab6b6;--color-neutral-700:#d7d3d3;--color-neutral-800:#eae7e7;--color-neutral-900:#f8f4f4;';
+
+class Component extends DCLogic {
+  state = { view:'signin', theme:'light', sidebarCollapsed:false, selectedPostId:null, expanded:{}, activeTags:[], ingestUrl:'', ingestFocused:false, toast:null, searchQuery:'wallpaper', noteDraft:'', extraNotes:{}, placeholderIdx:0, howStep:0 };
+  _toastTimer = null;
+  _placeholderTimer = null;
+  _howTimer = null;
+
+  componentDidMount() {
+    this._placeholderTimer = setInterval(() => this.setState(s => ({ placeholderIdx: (s.placeholderIdx + 1) % PLACEHOLDERS.length })), 3200);
+    this._howTimer = setInterval(() => this.setState(s => ({ howStep: (s.howStep + 1) % HOW_STEPS.length })), 3400);
+  }
+  componentWillUnmount() {
+    clearInterval(this._placeholderTimer);
+    clearInterval(this._howTimer);
+  }
+  onIngestFocus = () => this.setState({ ingestFocused: true });
+  onIngestBlur = () => this.setState({ ingestFocused: false });
+
+  goHome = () => this.setState({ view:'feed', activeTag:null });
+  goFeed = () => this.setState({ view:'feed' });
+  goSearch = () => this.setState({ view:'search' });
+  goProfile = () => this.setState({ view:'profile' });
+  goSettings = () => this.setState({ view:'settings' });
+  goEmpty = () => this.setState({ view:'empty' });
+  goHow = () => this.setState({ view:'how' });
+  goSignin = () => this.setState({ view:'signin' });
+  signIn = () => {
+    this.setState({ view:'feed', toast:'✓ Signed in as riya@nagorik.tech' });
+    clearTimeout(this._toastTimer);
+    this._toastTimer = setTimeout(() => this.setState({ toast:null }), 2600);
+  };
+  toggleTheme = () => this.setState(s => ({ theme: s.theme === 'light' ? 'dark' : 'light' }));
+  toggleSidebar = () => this.setState(s => ({ sidebarCollapsed: !s.sidebarCollapsed }));
+  openPost = (id) => this.setState({ selectedPostId:id });
+  closePost = () => this.setState({ selectedPostId:null, noteDraft:'' });
+  stopProp = (e) => e.stopPropagation();
+  toggleSource = (id) => this.setState(s => ({ expanded:{...s.expanded,[id]: !s.expanded[id]} }));
+  selectTag = (name) => this.setState(s => ({
+    activeTags: s.activeTags.includes(name) ? s.activeTags.filter(t => t !== name) : [...s.activeTags, name],
+    view:'feed',
+  }));
+  removeTag = (name) => this.setState(s => ({ activeTags: s.activeTags.filter(t => t !== name) }));
+  clearTag = () => this.setState({ activeTags:[] });
+  onIngestChange = (e) => this.setState({ ingestUrl: e.target.value });
+  onIngestKeyDown = (e) => { if (e.key === 'Enter') this.submitIngest(); };
+  onSearchChange = (e) => this.setState({ searchQuery: e.target.value });
+  onNoteDraftChange = (e) => this.setState({ noteDraft: e.target.value });
+  onNoteKeyDown = (e) => { if (e.key === 'Enter') this.addNote(); };
+
+  submitIngest = () => {
+    if (!this.state.ingestUrl.trim()) return;
+    this.setState({ ingestUrl:'', toast:'✓ Link saved — added to All Posts' });
+    clearTimeout(this._toastTimer);
+    this._toastTimer = setTimeout(() => this.setState({ toast:null }), 2600);
+  };
+
+  addNote = () => {
+    const id = this.state.selectedPostId;
+    const text = this.state.noteDraft.trim();
+    if (!id || !text) return;
+    this.setState(s => ({
+      extraNotes: { ...s.extraNotes, [id]: [ ...(s.extraNotes[id]||[]), { author:'You', text } ] },
+      noteDraft:''
+    }));
+  };
+
+  renderVals() {
+    const s = this.state;
+    const btnStyle = (active) => `border:none;cursor:pointer;width:34px;height:34px;display:flex;align-items:center;justify-content:center;transition:background-color .2s ease,transform .15s ease;background:${active?'var(--color-accent)':'transparent'};color:${active?'var(--color-bg)':'var(--color-text)'}`;
+
+    const marqueeCols = [0,1,2].map(i => {
+      const imgs = RAW_POSTS.slice(i*6, i*6+6).map(p => `assets/photo-${((p.id-1)%8)+1}.jpg`);
+      const doubled = [...imgs, ...imgs];
+      return { imgs: doubled, duration: 22 + i*4, direction: i === 1 ? 'reverse' : 'normal' };
+    });
+
+    const howSteps = HOW_STEPS.map((step, i) => {
+      const active = s.howStep === i;
+      return {
+        ...step,
+        isConnect: step.key==='connect', isShare: step.key==='share', isSort: step.key==='sort', isFind: step.key==='find',
+        hasLine: i < HOW_STEPS.length - 1,
+        circleStyle: `width:40px;height:40px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background-color .3s ease,color .3s ease,transform .3s cubic-bezier(.34,1.56,.64,1);background:${active?'var(--color-accent)':'var(--color-neutral-200)'};color:${active?'var(--color-bg)':'var(--color-neutral-600)'};transform:scale(${active?1.1:1})`,
+        titleStyle: `font-family:var(--font-heading);font-weight:800;font-size:15px;transition:color .3s ease;color:${active?'var(--color-text)':'var(--color-neutral-700)'}`,
+        progressStyle: `height:100%;background:var(--color-accent);width:${active?'100%':'0%'};transition:width ${active?'3.3s linear':'0s'}`,
+      };
+    });
+
+    const postsView = RAW_POSTS.map((p, i) => ({
+      ...p,
+      bg: SHADES[i % 3],
+      img: `assets/photo-${((p.id - 1) % 8) + 1}.jpg`,
+      isVideo: p.kind === 'video',
+      isCarousel: p.kind === 'carousel',
+      isArticle: p.kind === 'article',
+      typeLabel: p.kind === 'video' ? 'VIDEO' : p.kind === 'carousel' ? 'CAROUSEL' : p.kind === 'article' ? 'LINK' : 'IMAGE',
+      open: () => this.openPost(p.id),
+    }));
+
+    const feedPosts = s.activeTags.length ? postsView.filter(p => p.tags.some(t => s.activeTags.includes(t))) : postsView;
+    const q = s.searchQuery.trim().toLowerCase();
+    const searchPosts = q ? postsView.filter(p => p.caption.toLowerCase().includes(q) || p.tags.some(t => t.toLowerCase().includes(q))) : postsView;
+
+    const sourcesWithState = SOURCES.map((src, i) => {
+      const expanded = !!s.expanded[src.id];
+      return {
+        ...src,
+        initial: src.platform[0],
+        expanded, collapsed: !expanded,
+        caretRotate: expanded ? 90 : 0,
+        rowDelay: i * 35,
+        boardsRows: expanded ? '1fr' : '0fr',
+        boardsOpacity: expanded ? 1 : 0,
+        boardsShift: expanded ? 0 : -6,
+        toggle: () => this.toggleSource(src.id),
+        boards: src.boards.map(b => ({ ...b, select: () => this.selectTag(b.name) })),
+      };
+    });
+
+    const tagsWithState = TAGS.map(name => ({
+      name,
+      className: `tag ${s.activeTags.includes(name) ? 'tag-accent' : 'tag-neutral'}`,
+      select: () => this.selectTag(name),
+    }));
+    const activeTagChips = s.activeTags.map(name => ({ name, remove: () => this.removeTag(name) }));
+
+    const selPost = s.selectedPostId ? postsView.find(p => p.id === s.selectedPostId) : null;
+    const selectedPost = selPost ? {
+      ...selPost,
+      notes: [ ...(NOTES_SEED[selPost.id]||[]), ...(s.extraNotes[selPost.id]||[]) ],
+      noNotes: [ ...(NOTES_SEED[selPost.id]||[]), ...(s.extraNotes[selPost.id]||[]) ].length === 0,
+    } : null;
+
+    return {
+      toast: s.toast,
+      ingestUrl: s.ingestUrl,
+      searchQuery: s.searchQuery,
+      noteDraft: s.noteDraft,
+      themeVars: s.theme === 'dark' ? DARK_VARS : LIGHT_VARS,
+      isDark: s.theme === 'dark', isLight: s.theme === 'light', toggleTheme: this.toggleTheme,
+      isFeed: s.view === 'feed', isSearch: s.view === 'search', isSettings: s.view === 'settings', isEmpty: s.view === 'empty', isProfile: s.view === 'profile', isHow: s.view === 'how',
+      isSignin: s.view === 'signin', isAppShell: s.view !== 'signin',
+      feedBtnStyle: btnStyle(s.view==='feed'), searchBtnStyle: btnStyle(s.view==='search'), settingsBtnStyle: btnStyle(s.view==='settings'), emptyBtnStyle: btnStyle(s.view==='empty'), profileBtnStyle: btnStyle(s.view==='profile'),
+      howBtnStyle: btnStyle(s.view==='how'), signinBtnStyle: btnStyle(false),
+      goHow: this.goHow, goSignin: this.goSignin, signIn: this.signIn,
+      marqueeCols, howSteps,
+      homeBtnStyle: `width:100%;display:flex;align-items:center;gap:8px;border:none;padding:9px 8px;cursor:pointer;text-align:left;justify-content:${s.sidebarCollapsed?'center':'flex-start'};font-family:var(--font-heading);font-weight:800;font-size:13px;transition:background-color .2s ease;background:${s.view==='feed'&&!s.activeTag?'var(--color-accent)':'transparent'};color:${s.view==='feed'&&!s.activeTag?'var(--color-bg)':'var(--color-text)'}`,
+      sidebarWidth: s.sidebarCollapsed ? 68 : 264,
+      sidebarPad: s.sidebarCollapsed ? 10 : 16,
+      isSidebarExpanded: !s.sidebarCollapsed, isSidebarCollapsed: s.sidebarCollapsed,
+      expandedContentStyle: `display:flex;flex-direction:column;gap:var(--space-4);opacity:${s.sidebarCollapsed?0:1};transition:opacity .16s ease ${s.sidebarCollapsed?'0s':'.1s'};pointer-events:${s.sidebarCollapsed?'none':'auto'}`,
+      collapsedContentStyle: `display:flex;flex-direction:column;gap:8px;align-items:center;opacity:${s.sidebarCollapsed?1:0};transition:opacity .16s ease ${s.sidebarCollapsed?'.22s':'0s'};pointer-events:${s.sidebarCollapsed?'auto':'none'};position:${s.sidebarCollapsed?'static':'absolute'}`,
+      chevronRotate: s.sidebarCollapsed ? 180 : 0,
+      toggleSidebar: this.toggleSidebar,
+      connectBtnStyle: `width:100%;margin-top:8px;gap:8px;justify-content:${s.sidebarCollapsed?'center':'flex-start'};padding:${s.sidebarCollapsed?'8px':'8px 14px'}`,
+      goHome: this.goHome, goFeed: this.goFeed, goSearch: this.goSearch, goProfile: this.goProfile, goSettings: this.goSettings, goEmpty: this.goEmpty,
+      sourcesWithState, tagsWithState,
+      profileStats: { posts: postsView.length, boards: TAGS.length, sources: SOURCES.length, saves: postsView.reduce((a,p)=>a+p.saves,0) },
+      profilePosts: postsView.slice(0, 8),
+      activeTagChips, hasActiveTags: s.activeTags.length > 0, clearTag: this.clearTag,
+      feedPosts, feedCountLabel: `${feedPosts.length} posts`,
+      searchPosts, searchCountLabel: `${searchPosts.length} results`, onSearchChange: this.onSearchChange,
+      onIngestChange: this.onIngestChange, onIngestKeyDown: this.onIngestKeyDown, submitIngest: this.submitIngest,
+      onIngestFocus: this.onIngestFocus, onIngestBlur: this.onIngestBlur,
+      ingestMaxWidth: s.ingestFocused ? '460px' : '360px',
+      ingestPlaceholder: s.ingestUrl ? 'Paste a link to save it…' : PLACEHOLDERS[s.placeholderIdx],
+      linkIconRotate: s.ingestFocused ? 45 : 0,
+      selectedPost, closePost: this.closePost, stopProp: this.stopProp,
+      onNoteDraftChange: this.onNoteDraftChange, onNoteKeyDown: this.onNoteKeyDown, addNote: this.addNote,
+    };
+  }
+}
+
+</script>
+</body>
+</html>

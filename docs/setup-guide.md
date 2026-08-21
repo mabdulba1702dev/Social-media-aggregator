@@ -95,7 +95,7 @@ Recommend **private** repo while this is pre-launch.
      -d "secret_token=<SECRET>"
    ```
    Verify it took with `curl "https://api.telegram.org/bot<TOKEN>/getWebhookInfo"`.
-6. Connecting a group to a board: there's no UI for this yet (Phase 1 item, not built) — insert a row into `sources` directly (`platform: 'telegram'`, `external_group_id`: the group's chat ID as a string, e.g. `-1001234567890` — get it from `getWebhookInfo`'s pending updates, or from the bot's own logs once one message comes in and fails to match a source).
+6. Connecting a group to a board: use the board's **Connected groups** page (`/boards/<id>/sources`) — pick Telegram, paste the group's chat ID (a negative number, e.g. `-1001234567890` — get it from `getWebhookInfo`'s pending updates, or from the bot's own logs the first time a message from an unconnected group arrives), optionally name it, and connect. No more direct DB inserts needed for this step.
 
 **Discord:**
 1. discord.developers.com → New Application.
@@ -103,6 +103,7 @@ Recommend **private** repo while this is pre-launch.
 3. Under **Privileged Gateway Intents**, enable **Message Content Intent** (required to read link text in messages).
 4. Use the OAuth2 URL generator (scope: `bot`, permissions: Read Messages/View Channels) to get an invite link, and add the bot to your server.
 5. Remember from the PRD: Discord's Gateway connection needs a small always-on worker (Railway/Fly.io free tier) — it won't run on Vercel's serverless functions like the Telegram webhook does.
+6. Connecting a channel to a board: same **Connected groups** page as Telegram (`/boards/<id>/sources`) — pick Discord, paste the channel ID (enable Developer Mode in Discord's own settings, then right-click the channel → Copy Channel ID). The Discord worker itself isn't built yet (`worker/src/discord.ts` doesn't exist) — connecting the source now doesn't do anything until that lands.
 
 **WhatsApp** (moved up into Phase 2, alongside Discord — see the roadmap update in `docs/PRD.md` §13): using **Baileys** (`WhiskeySockets/Baileys` on GitHub/npm), the most actively maintained and widely used unofficial WhatsApp Web library. There is still no official API for reading messages in a normal group, so this remains a real risk, not a solved problem — treat the following as risk *reduction*, not risk *elimination*:
 
@@ -117,6 +118,8 @@ Setup:
 npm install baileys
 ```
 Baileys authenticates by scanning a QR code (or entering a pairing code) with the dedicated number's WhatsApp app — no API key or developer account involved. Like Discord, this needs the always-on worker (not a Vercel serverless function) to hold the persistent connection and store the auth session (persist it in Supabase Storage so a worker restart doesn't force re-pairing).
+
+Connecting a WhatsApp group to a board: same **Connected groups** page (`/boards/<id>/sources`) — pick WhatsApp, paste the group's JID (ends in `@g.us`; the worker's own console logs it the first time a message from an unconnected group arrives).
 
 ## 7. 21st.dev — Magic MCP (AI-assisted UI components)
 

@@ -12,6 +12,13 @@ the same PR — see `CONTRIBUTING.md`.
 
 ### Added
 
+- Sources UI (`app/boards/[boardId]/sources/`): connect/rename/pause/
+  disconnect a Telegram/Discord/WhatsApp group against a board from a real
+  page, replacing the "insert a `sources` row directly" workaround. Shows
+  per-platform guidance on finding the raw group/channel ID (no in-app
+  discovery mechanism yet — that's still a manual lookup) and surfaces the
+  `unique(platform, external_group_id)` conflict as a friendly "already
+  connected to a board" message rather than a raw DB error.
 - Lazy-mounted embeds (`components/lazy-mount.tsx`): each post card's oEmbed
   `<script>` now only fetches/executes once the card scrolls near the
   viewport (`IntersectionObserver`, 400px rootMargin), instead of every
