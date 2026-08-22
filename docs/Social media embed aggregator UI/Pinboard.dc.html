@@ -25,7 +25,12 @@ a:hover{color:var(--color-accent-700)}
 <div style="display:flex;height:100vh;width:100%;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);overflow:hidden;transition:background-color .3s ease,color .3s ease;{{ themeVars }}">
 
 <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
-  <div style="position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:50;background:var(--color-text);color:var(--color-bg);padding:10px 18px;font-size:13px;font-family:var(--font-heading);font-weight:800;box-shadow:var(--shadow-lg)">{{ toast }}</div>
+  <div style="position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:50;background:var(--color-text);color:var(--color-bg);padding:10px 18px;font-size:13px;font-family:var(--font-heading);font-weight:800;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:16px;animation:pbFadeIn .2s ease">
+    <span>{{ toast }}</span>
+    <sc-if value="{{ toastAction }}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{ toastAction }}" style="border:none;background:none;color:var(--color-accent-400);font-family:var(--font-heading);font-weight:800;font-size:13px;cursor:pointer;padding:0">Undo</button>
+    </sc-if>
+  </div>
 </sc-if>
 
 <sc-if value="{{ isSignin }}" hint-placeholder-val="{{ true }}">
@@ -47,11 +52,7 @@ a:hover{color:var(--color-accent-700)}
     <div style="flex:1;position:relative;overflow:hidden;border-left:2px solid var(--color-divider);background:var(--color-surface);display:flex;gap:12px;padding:12px">
       <sc-for list="{{ marqueeCols }}" as="col" hint-placeholder-count="3">
         <div style="flex:1;overflow:hidden;position:relative">
-          <div style="display:flex;flex-direction:column;gap:12px;animation:pbMarquee {{ col.duration }}s linear infinite;animation-direction:{{ col.direction }}" style-hover="animation-play-state:paused">
-            <sc-for list="{{ col.imgs }}" as="imgUrl" hint-placeholder-count="12">
-              <img src="{{ imgUrl }}" class="grayscale" style="width:100%;height:220px;object-fit:cover;display:block"/>
-            </sc-for>
-          </div>
+          <div style="display:flex;flex-direction:column;gap:12px;animation:pbMarquee {{ col.duration }}s linear infinite;animation-direction:{{ col.direction }}" style-hover="animation-play-state:paused">{{ col.nodes }}</div>
         </div>
       </sc-for>
     </div>
@@ -62,9 +63,14 @@ a:hover{color:var(--color-accent-700)}
 
 <aside style="width:{{ sidebarWidth }}px;flex:0 0 {{ sidebarWidth }}px;border-right:2px solid var(--color-divider);display:flex;flex-direction:column;padding:var(--space-4) {{ sidebarPad }}px;gap:var(--space-4);overflow-y:auto;overflow-x:hidden;position:relative;transition:width .38s cubic-bezier(.16,1,.3,1),padding .38s cubic-bezier(.16,1,.3,1),border-color .3s ease">
 
-  <button onClick="{{ toggleSidebar }}" title="Collapse sidebar" style="position:absolute;top:14px;right:-13px;width:26px;height:26px;border-radius:50%;background:var(--color-surface);border:1px solid var(--color-divider);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:5;padding:0;transition:background-color .3s ease">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transition:transform .38s cubic-bezier(.16,1,.3,1);transform:rotate({{ chevronRotate }}deg)"><polyline points="15 18 9 12 15 6"/></svg>
-  </button>
+  <div style="display:flex;align-items:center;gap:8px;justify-content:{{ railHeadJustify }}">
+    <sc-if value="{{ isSidebarExpanded }}" hint-placeholder-val="{{ true }}">
+      <h6 style="margin:0;flex:1;color:var(--color-neutral-600);white-space:nowrap">Library</h6>
+    </sc-if>
+    <button onClick="{{ toggleSidebar }}" title="Collapse sidebar" style="width:28px;height:28px;flex:none;background:transparent;border:2px solid var(--color-divider);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;color:var(--color-text);transition:background-color .2s ease,border-color .3s ease" style-hover="background:var(--color-neutral-200)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transition:transform .38s cubic-bezier(.16,1,.3,1);transform:rotate({{ chevronRotate }}deg)"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+  </div>
 
   <button style="{{ homeBtnStyle }}" onClick="{{ goHome }}" title="All Posts">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M3 9.5L12 3l9 6.5V21a1 1 0 01-1 1h-5v-7H9v7H4a1 1 0 01-1-1z"/></svg>
@@ -118,7 +124,7 @@ a:hover{color:var(--color-accent-700)}
 
   <div style="flex:1"></div>
   <div class="hr" style="margin:0"></div>
-  <button class="btn btn-secondary" onClick="{{ goSettings }}" title="Connect a group" style="{{ connectBtnStyle }}">
+  <button class="btn btn-secondary" onClick="{{ openConnectModal }}" title="Connect a group" style="{{ connectBtnStyle }}">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     <sc-if value="{{ isSidebarExpanded }}" hint-placeholder-val="{{ true }}"><span>Connect a group</span></sc-if>
   </button>
@@ -153,7 +159,7 @@ a:hover{color:var(--color-accent-700)}
       </sc-if>
     </button>
     <button onClick="{{ goProfile }}" style="flex:none;width:36px;height:36px;padding:0;border:none;cursor:pointer;overflow:hidden;background:var(--color-neutral-300)">
-      <img src="assets/photo-6.jpg" class="grayscale" style="width:100%;height:100%;object-fit:cover;display:block"/>
+      <img src="assets/img-6.png" class="grayscale" style="width:100%;height:100%;object-fit:cover;display:block"/>
     </button>
   </div>
 
@@ -161,9 +167,65 @@ a:hover{color:var(--color-accent-700)}
 
     <sc-if value="{{ isFeed }}" hint-placeholder-val="{{ true }}">
       <div style="animation:pbFadeIn .35s ease">
+        <div style="border:2px solid var(--color-text);display:flex;margin-bottom:var(--space-6);min-height:300px;transition:border-color .3s ease">
+          <div style="flex:0 0 46%;position:relative;overflow:hidden;background:var(--color-neutral-200)">
+{{ spotlightNodes }}            <div style="position:absolute;left:0;bottom:0;background:var(--color-text);color:var(--color-bg);font-family:var(--font-heading);font-weight:800;font-size:11px;letter-spacing:.1em;padding:6px 10px">{{ spotlightCounter }}</div>
+          </div>
+          <div style="flex:1;padding:var(--space-6);display:flex;flex-direction:column;gap:var(--space-3);min-width:0">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="width:7px;height:7px;background:var(--color-accent);flex:none"></span>
+              <span style="font-family:var(--font-heading);font-weight:800;font-size:11px;letter-spacing:.14em;text-transform:uppercase">Spotlight</span>
+              <span class="text-muted" style="font-size:11px;letter-spacing:.06em;text-transform:uppercase">{{ spotlight.sourceName }}</span>
+            </div>
+            <h2 style="margin:0;font-size:30px;line-height:1.06;text-wrap:pretty">{{ spotlight.caption }}</h2>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <span class="tag tag-neutral">{{ spotlight.platformLabel }}</span>
+              <sc-for list="{{ spotlight.tags }}" as="st" hint-placeholder-count="2">
+                <span class="tag tag-outline">{{ st }}</span>
+              </sc-for>
+            </div>
+            <p class="text-muted" style="margin:0;font-size:13px">Shared by {{ spotlight.sender }} · {{ spotlight.timeAgo }} · {{ spotlight.saves }} saves</p>
+            <div style="flex:1"></div>
+            <div style="display:flex;align-items:center;gap:var(--space-3)">
+              <button class="btn btn-primary" onClick="{{ openSpotlight }}" style="transition:transform .15s ease" style-active="transform:scale(.97)">Open post</button>
+              <div style="display:flex;gap:6px;margin-left:auto">
+                <sc-for list="{{ spotlightDots }}" as="d" hint-placeholder-count="5">
+                  <button onClick="{{ d.select }}" style="{{ d.style }}"></button>
+                </sc-for>
+              </div>
+              <button class="btn btn-icon btn-secondary" onClick="{{ prevSpotlight }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+              <button class="btn btn-icon btn-secondary" onClick="{{ nextSpotlight }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+            </div>
+          </div>
+        </div>
         <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:var(--space-4)">
           <h2 style="margin:0">All Posts</h2>
           <span style="color:var(--color-neutral-600);font-size:13px">{{ feedCountLabel }}</span>
+        </div>
+        <div style="margin-bottom:var(--space-6)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-2)">
+            <h4 style="margin:0">Trending this week</h4>
+            <div style="display:flex;gap:4px">
+              <button class="btn btn-icon btn-ghost" onClick="{{ scrollTrendLeft }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+              <button class="btn btn-icon btn-ghost" onClick="{{ scrollTrendRight }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+            </div>
+          </div>
+          <div ref="{{ trendRef }}" onMouseEnter="{{ pauseTrend }}" onMouseLeave="{{ resumeTrend }}" style="display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:8px">
+            <sc-for list="{{ trendingPosts }}" as="tp" hint-placeholder-count="0">
+              <div onClick="{{ tp.open }}" style="flex:0 0 190px;scroll-snap-align:start;cursor:pointer;background:var(--color-surface);transition:transform .2s ease" style-hover="transform:translateY(-2px)">
+                <div style="height:120px;overflow:hidden">
+                  {{ tp.imgNode }}
+                </div>
+                <div style="padding:8px 10px;display:flex;flex-direction:column;gap:4px">
+                  <div style="font-size:12.5px;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ tp.caption }}</div>
+                  <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--color-neutral-600)">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 011 1v17l-7-4-7 4V4a1 1 0 011-1z"/></svg>
+                    {{ tp.saves }}
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
         </div>
         <sc-if value="{{ hasActiveTags }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:var(--space-4);animation:pbFadeIn .2s ease">
@@ -229,19 +291,19 @@ a:hover{color:var(--color-accent-700)}
             <span class="card-kicker">WhatsApp</span>
             <div class="card-title" style="font-size:15px">Add the Pinboard number</div>
             <p class="card-body">1. Add +1 (555) 019-9021 to your group. 2. Send /connect. 3. Forwarded links appear here automatically.</p>
-            <button class="btn btn-secondary btn-block">Get invite link</button>
+            <button class="btn btn-secondary btn-block" onClick="{{ openConnectWhatsApp }}">Get invite link</button>
           </div>
           <div class="card elev-sm">
             <span class="card-kicker">Telegram</span>
             <div class="card-title" style="font-size:15px">Invite @PinboardCollectorBot</div>
             <p class="card-body">1. Add the bot to your group. 2. Send /connect. 3. Approve read access to shared links.</p>
-            <button class="btn btn-secondary btn-block">Get invite link</button>
+            <button class="btn btn-secondary btn-block" onClick="{{ openConnectTelegram }}">Get invite link</button>
           </div>
           <div class="card elev-sm">
             <span class="card-kicker">Discord</span>
             <div class="card-title" style="font-size:15px">Invite the Pinboard bot</div>
             <p class="card-body">1. Authorize the bot for your server. 2. Run /pinboard connect. 3. Pick which channels to watch.</p>
-            <button class="btn btn-secondary btn-block">Get invite link</button>
+            <button class="btn btn-secondary btn-block" onClick="{{ openConnectDiscord }}">Get invite link</button>
           </div>
         </div>
       </div>
@@ -259,7 +321,7 @@ a:hover{color:var(--color-accent-700)}
     <sc-if value="{{ isHow }}" hint-placeholder-val="{{ false }}">
       <div style="max-width:640px;animation:pbFadeIn .35s ease">
         <h2 style="margin:0 0 var(--space-2)">How Pinboard works</h2>
-        <p class="text-muted" style="margin:0 0 var(--space-5)">Four steps, no copy-pasting into an app.</p>
+        <p class="text-muted" style="margin:0 0 var(--space-6)">Four steps, no copy-pasting into an app.</p>
         <div style="display:flex;flex-direction:column">
           <sc-for list="{{ howSteps }}" as="step" hint-placeholder-count="4">
             <div style="display:flex;gap:var(--space-4)">
@@ -282,7 +344,7 @@ a:hover{color:var(--color-accent-700)}
                   <div style="width:2px;flex:1;background:var(--color-divider);min-height:36px;transition:background-color .3s ease"></div>
                 </sc-if>
               </div>
-              <div style="padding-bottom:var(--space-5);flex:1">
+              <div style="padding-bottom:var(--space-6);flex:1">
                 <div style="{{ step.titleStyle }}">{{ step.title }}</div>
                 <p class="text-muted" style="margin:6px 0 0;font-size:13.5px">{{ step.desc }}</p>
                 <div style="height:2px;background:var(--color-neutral-200);margin-top:10px;overflow:hidden;width:120px">
@@ -299,10 +361,10 @@ a:hover{color:var(--color-accent-700)}
     <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
       <div style="max-width:900px;animation:pbFadeIn .35s ease">
         <div style="display:flex;gap:var(--space-4);align-items:flex-start;margin-bottom:var(--space-4)">
-          <img src="assets/photo-6.jpg" class="grayscale" style="width:96px;height:96px;object-fit:cover;flex:none"/>
+          <img src="assets/img-6.png" class="grayscale" style="width:96px;height:96px;object-fit:cover;flex:none"/>
           <div style="flex:1">
-            <h2 style="margin:0">Riya Chen</h2>
-            <div class="text-muted" style="font-size:13px;margin-bottom:6px">@riyachen · joined March 2025</div>
+            <h2 style="margin:0">Marisol Adeyemi</h2>
+            <div class="text-muted" style="font-size:13px;margin-bottom:6px">@kestrelfold · joined March 2025</div>
             <p style="margin:0;font-size:14px;max-width:480px">Collects design references, food, and travel finds from six group chats into one board.</p>
           </div>
           <button class="btn btn-secondary" style="flex:none">Edit profile</button>
@@ -349,6 +411,48 @@ a:hover{color:var(--color-accent-700)}
 
 </sc-if>
 
+<sc-if value="{{ connectModalOpen }}" hint-placeholder-val="{{ false }}">
+  <div class="dialog-backdrop" onClick="{{ closeConnectModal }}">
+    <div class="dialog" style="width:min(460px,100%)" onClick="{{ stopProp }}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div class="dialog-title">Connect a group</div>
+        <button class="btn btn-icon btn-ghost" onClick="{{ closeConnectModal }}">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div style="display:flex;gap:6px">
+        <sc-for list="{{ connectStepDots }}" as="dot" hint-placeholder-count="3">
+          <div style="{{ dot.style }}"></div>
+        </sc-for>
+      </div>
+      <sc-if value="{{ isConnectStep0 }}" hint-placeholder-val="{{ true }}">
+        <p class="text-muted" style="margin:0">Choose where your group lives.</p>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-secondary btn-block" onClick="{{ pickWhatsApp }}">WhatsApp</button>
+          <button class="btn btn-secondary btn-block" onClick="{{ pickTelegram }}">Telegram</button>
+          <button class="btn btn-secondary btn-block" onClick="{{ pickDiscord }}">Discord</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isConnectStep1 }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+          <span class="tag tag-neutral">{{ connectPlatform }}</span>
+          <div style="height:160px;background:var(--color-neutral-200);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-weight:800;font-size:12px;color:var(--color-neutral-600);letter-spacing:.05em">QR CODE</div>
+          <p class="card-body" style="margin:0">{{ connectInstructions }}</p>
+          <button class="btn btn-primary" onClick="{{ nextConnectStep }}">I've added the bot</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isConnectStep2 }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:var(--space-3);text-align:center;padding:var(--space-3) 0">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <h4 style="margin:0">Connected</h4>
+          <p class="text-muted" style="margin:0">Links shared in this group will start appearing on your board.</p>
+          <button class="btn btn-primary btn-block" onClick="{{ finishConnect }}">Done</button>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+</sc-if>
+
 <sc-if value="{{ selectedPost }}" hint-placeholder-val="{{ false }}">
   <div class="dialog-backdrop" onClick="{{ closePost }}">
     <div class="dialog" style="width:min(560px,100%)" onClick="{{ stopProp }}">
@@ -359,7 +463,7 @@ a:hover{color:var(--color-accent-700)}
         </button>
       </div>
       <div style="height:280px;background:{{ selectedPost.bg }};overflow:hidden">
-        <img src="{{ selectedPost.img }}" class="grayscale" style="width:100%;height:100%;object-fit:cover;display:block"/>
+        {{ selectedPostImgNode }}
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
         <span class="tag tag-neutral">{{ selectedPost.platformLabel }}</span>
@@ -459,19 +563,40 @@ const LIGHT_VARS = '--color-bg:#f3f2f2;--color-surface:#eae9e9;--color-text:#201
 const DARK_VARS = '--color-bg:#1c1a1a;--color-surface:#272424;--color-text:#f3f2f2;--color-divider:color-mix(in srgb, #f3f2f2 30%, transparent);--color-neutral-100:#2d2b2b;--color-neutral-200:#444141;--color-neutral-300:#605d5d;--color-neutral-400:#7d7979;--color-neutral-500:#9b9797;--color-neutral-600:#bab6b6;--color-neutral-700:#d7d3d3;--color-neutral-800:#eae7e7;--color-neutral-900:#f8f4f4;';
 
 class Component extends DCLogic {
-  state = { view:'signin', theme:'light', sidebarCollapsed:false, selectedPostId:null, expanded:{}, activeTags:[], ingestUrl:'', ingestFocused:false, toast:null, searchQuery:'wallpaper', noteDraft:'', extraNotes:{}, placeholderIdx:0, howStep:0 };
+  state = { view:'signin', theme:'light', sidebarCollapsed:false, selectedPostId:null, expanded:{}, activeTags:[], ingestUrl:'', ingestFocused:false, toast:null, toastAction:null, searchQuery:'wallpaper', noteDraft:'', extraNotes:{}, placeholderIdx:0, howStep:0, removedIds:[], connectModalOpen:false, connectStep:0, connectPlatform:null, spotlightIdx:0 };
   _toastTimer = null;
   _placeholderTimer = null;
   _howTimer = null;
+  _trendTimer = null;
+  _spotTimer = null;
+  _trendPaused = false;
 
   componentDidMount() {
-    this._placeholderTimer = setInterval(() => this.setState(s => ({ placeholderIdx: (s.placeholderIdx + 1) % PLACEHOLDERS.length })), 3200);
-    this._howTimer = setInterval(() => this.setState(s => ({ howStep: (s.howStep + 1) % HOW_STEPS.length })), 3400);
+    this._placeholderTimer = setInterval(() => { if (this._onFeed()) this.setState(s => ({ placeholderIdx: (s.placeholderIdx + 1) % PLACEHOLDERS.length })); }, 3200);
+    this._howTimer = setInterval(() => { if (this.state.view === 'how') this.setState(s => ({ howStep: (s.howStep + 1) % HOW_STEPS.length })); }, 3400);
+    this._trendTimer = setInterval(() => {
+      const el = this._trendEl;
+      if (!el || this._trendPaused || !this._onFeed()) return;
+      if (el.scrollLeft + el.clientWidth >= el.scrollWidth - 10) el.scrollTo({ left:0, behavior:'smooth' });
+      else el.scrollBy({ left:210, behavior:'smooth' });
+    }, 3000);
+    this._spotTimer = setInterval(() => { if (this._onFeed()) this.setState(s => ({ spotlightIdx: (s.spotlightIdx + 1) % 5 })); }, 5200);
   }
+  _onFeed = () => this.state.view === 'feed' && !this.state.selectedPostId && !this.state.connectModalOpen;
   componentWillUnmount() {
     clearInterval(this._placeholderTimer);
     clearInterval(this._howTimer);
+    clearInterval(this._trendTimer);
+    clearInterval(this._spotTimer);
   }
+  nextSpotlight = () => this.setState(s => ({ spotlightIdx: (s.spotlightIdx + 1) % 5 }));
+  prevSpotlight = () => this.setState(s => ({ spotlightIdx: (s.spotlightIdx + 4) % 5 }));
+  selectSpotlight = (i) => this.setState({ spotlightIdx: i });
+  setTrendRef = (el) => { this._trendEl = el; };
+  pauseTrend = () => { this._trendPaused = true; };
+  resumeTrend = () => { this._trendPaused = false; };
+  scrollTrendLeft = () => { if (this._trendEl) this._trendEl.scrollBy({ left:-210, behavior:'smooth' }); };
+  scrollTrendRight = () => { if (this._trendEl) this._trendEl.scrollBy({ left:210, behavior:'smooth' }); };
   onIngestFocus = () => this.setState({ ingestFocused: true });
   onIngestBlur = () => this.setState({ ingestFocused: false });
 
@@ -484,7 +609,7 @@ class Component extends DCLogic {
   goHow = () => this.setState({ view:'how' });
   goSignin = () => this.setState({ view:'signin' });
   signIn = () => {
-    this.setState({ view:'feed', toast:'✓ Signed in as riya@nagorik.tech' });
+    this.setState({ view:'feed', toast:'✓ Signed in as m.adeyemi@kestrelfold.co' });
     clearTimeout(this._toastTimer);
     this._toastTimer = setTimeout(() => this.setState({ toast:null }), 2600);
   };
@@ -494,6 +619,23 @@ class Component extends DCLogic {
   closePost = () => this.setState({ selectedPostId:null, noteDraft:'' });
   stopProp = (e) => e.stopPropagation();
   toggleSource = (id) => this.setState(s => ({ expanded:{...s.expanded,[id]: !s.expanded[id]} }));
+  removePost = (id) => {
+    const undo = () => this.setState({ removedIds: this.state.removedIds.filter(x => x !== id), toast:null, toastAction:null });
+    this.setState(s => ({ removedIds:[...s.removedIds, id], toast:'Post removed', toastAction: undo }));
+    clearTimeout(this._toastTimer);
+    this._toastTimer = setTimeout(() => this.setState({ toast:null, toastAction:null }), 4000);
+  };
+  openConnectModal = (platform) => this.setState({ connectModalOpen:true, connectStep: platform ? 1 : 0, connectPlatform: platform || null });
+  closeConnectModal = () => this.setState({ connectModalOpen:false });
+  pickWhatsApp = () => this.setState({ connectPlatform:'WhatsApp', connectStep:1 });
+  pickTelegram = () => this.setState({ connectPlatform:'Telegram', connectStep:1 });
+  pickDiscord = () => this.setState({ connectPlatform:'Discord', connectStep:1 });
+  nextConnectStep = () => this.setState(s => ({ connectStep: Math.min(s.connectStep + 1, 2) }));
+  finishConnect = () => {
+    this.setState({ connectModalOpen:false, toast:`✓ ${this.state.connectPlatform} group connected`, toastAction:null });
+    clearTimeout(this._toastTimer);
+    this._toastTimer = setTimeout(() => this.setState({ toast:null }), 2600);
+  };
   selectTag = (name) => this.setState(s => ({
     activeTags: s.activeTags.includes(name) ? s.activeTags.filter(t => t !== name) : [...s.activeTags, name],
     view:'feed',
@@ -528,9 +670,13 @@ class Component extends DCLogic {
     const btnStyle = (active) => `border:none;cursor:pointer;width:34px;height:34px;display:flex;align-items:center;justify-content:center;transition:background-color .2s ease,transform .15s ease;background:${active?'var(--color-accent)':'transparent'};color:${active?'var(--color-bg)':'var(--color-text)'}`;
 
     const marqueeCols = [0,1,2].map(i => {
-      const imgs = RAW_POSTS.slice(i*6, i*6+6).map(p => `assets/photo-${((p.id-1)%8)+1}.jpg`);
+      const imgs = RAW_POSTS.slice(i*6, i*6+6).map(p => `assets/img-${((p.id-1)%8)+1}.png`);
       const doubled = [...imgs, ...imgs];
-      return { imgs: doubled, duration: 22 + i*4, direction: i === 1 ? 'reverse' : 'normal' };
+      return {
+        nodes: doubled.map((u, k) => React.createElement('img', { key:k, src:u, className:'grayscale', style:{ width:'100%', height:220, objectFit:'cover', display:'block' } })),
+        duration: 22 + i*4,
+        direction: i === 1 ? 'reverse' : 'normal',
+      };
     });
 
     const howSteps = HOW_STEPS.map((step, i) => {
@@ -548,13 +694,14 @@ class Component extends DCLogic {
     const postsView = RAW_POSTS.map((p, i) => ({
       ...p,
       bg: SHADES[i % 3],
-      img: `assets/photo-${((p.id - 1) % 8) + 1}.jpg`,
+      img: `assets/img-${((p.id - 1) % 8) + 1}.png`,
       isVideo: p.kind === 'video',
       isCarousel: p.kind === 'carousel',
       isArticle: p.kind === 'article',
       typeLabel: p.kind === 'video' ? 'VIDEO' : p.kind === 'carousel' ? 'CAROUSEL' : p.kind === 'article' ? 'LINK' : 'IMAGE',
       open: () => this.openPost(p.id),
-    }));
+      remove: () => this.removePost(p.id),
+    })).filter(p => !s.removedIds.includes(p.id));
 
     const feedPosts = s.activeTags.length ? postsView.filter(p => p.tags.some(t => s.activeTags.includes(t))) : postsView;
     const q = s.searchQuery.trim().toLowerCase();
@@ -590,6 +737,32 @@ class Component extends DCLogic {
       noNotes: [ ...(NOTES_SEED[selPost.id]||[]), ...(s.extraNotes[selPost.id]||[]) ].length === 0,
     } : null;
 
+    const trendingPosts = [...postsView].sort((a,b) => b.saves - a.saves).slice(0, 8).map((p, i) => ({
+      ...p,
+      imgNode: React.createElement('img', { key:i, src:p.img, className:'grayscale', style:{ width:'100%', height:'100%', objectFit:'cover', display:'block' } }),
+    }));
+
+    const spotPool = [...postsView].sort((a,b) => b.saves - a.saves).slice(0, 5);
+    const spotIdx = spotPool.length ? s.spotlightIdx % spotPool.length : 0;
+    const spotlight = spotPool[spotIdx] || { caption:'', tags:[] };
+    const spotlightNodes = spotPool.map((p, i) => React.createElement('img', {
+      key: i, src: p.img, className: 'grayscale',
+      style: { position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', opacity: i === spotIdx ? 1 : 0, transform: `scale(${i === spotIdx ? 1 : 1.05})`, transition:'opacity .7s ease, transform 5.5s linear' },
+    }));
+    const spotlightDots = spotPool.map((p, i) => ({
+      select: () => this.selectSpotlight(i),
+      style: `width:${i === spotIdx ? 22 : 8}px;height:8px;border:none;padding:0;cursor:pointer;background:${i === spotIdx ? 'var(--color-accent)' : 'var(--color-neutral-300)'};transition:width .3s cubic-bezier(.16,1,.3,1),background-color .3s ease`,
+    }));
+
+    const CONNECT_TEXT = {
+      WhatsApp: 'Forward the invite link to +1 (555) 019-9021, or scan the code from your group\'s settings, then send /connect.',
+      Telegram: 'Add @PinboardCollectorBot to the group, then send /connect and approve read access.',
+      Discord: 'Authorize the Pinboard bot for your server, then run /pinboard connect and pick channels to watch.',
+    };
+    const connectStepDots = [0,1,2].map(i => ({
+      style: `height:3px;flex:1;background:${i <= s.connectStep ? 'var(--color-accent)' : 'var(--color-neutral-200)'};transition:background-color .25s ease`,
+    }));
+
     return {
       toast: s.toast,
       ingestUrl: s.ingestUrl,
@@ -607,8 +780,8 @@ class Component extends DCLogic {
       sidebarWidth: s.sidebarCollapsed ? 68 : 264,
       sidebarPad: s.sidebarCollapsed ? 10 : 16,
       isSidebarExpanded: !s.sidebarCollapsed, isSidebarCollapsed: s.sidebarCollapsed,
-      expandedContentStyle: `display:flex;flex-direction:column;gap:var(--space-4);opacity:${s.sidebarCollapsed?0:1};transition:opacity .16s ease ${s.sidebarCollapsed?'0s':'.1s'};pointer-events:${s.sidebarCollapsed?'none':'auto'}`,
-      collapsedContentStyle: `display:flex;flex-direction:column;gap:8px;align-items:center;opacity:${s.sidebarCollapsed?1:0};transition:opacity .16s ease ${s.sidebarCollapsed?'.22s':'0s'};pointer-events:${s.sidebarCollapsed?'auto':'none'};position:${s.sidebarCollapsed?'static':'absolute'}`,
+      expandedContentStyle: s.sidebarCollapsed ? 'display:none' : 'display:flex;flex-direction:column;gap:var(--space-4);animation:pbFadeIn .25s ease',
+      collapsedContentStyle: s.sidebarCollapsed ? 'display:flex;flex-direction:column;gap:8px;align-items:center;animation:pbFadeIn .25s ease' : 'display:none',
       chevronRotate: s.sidebarCollapsed ? 180 : 0,
       toggleSidebar: this.toggleSidebar,
       connectBtnStyle: `width:100%;margin-top:8px;gap:8px;justify-content:${s.sidebarCollapsed?'center':'flex-start'};padding:${s.sidebarCollapsed?'8px':'8px 14px'}`,
@@ -625,7 +798,24 @@ class Component extends DCLogic {
       ingestPlaceholder: s.ingestUrl ? 'Paste a link to save it…' : PLACEHOLDERS[s.placeholderIdx],
       linkIconRotate: s.ingestFocused ? 45 : 0,
       selectedPost, closePost: this.closePost, stopProp: this.stopProp,
+      selectedPostImgNode: selectedPost ? React.createElement('img', { src:selectedPost.img, className:'grayscale', style:{ width:'100%', height:'100%', objectFit:'cover', display:'block' } }) : null,
       onNoteDraftChange: this.onNoteDraftChange, onNoteKeyDown: this.onNoteKeyDown, addNote: this.addNote,
+      toastAction: s.toastAction,
+      trendingPosts, trendRef: this.setTrendRef, pauseTrend: this.pauseTrend, resumeTrend: this.resumeTrend,
+      scrollTrendLeft: this.scrollTrendLeft, scrollTrendRight: this.scrollTrendRight,
+      spotlight, spotlightNodes, spotlightDots,
+      spotlightCounter: `${String(spotIdx + 1).padStart(2,'0')} / ${String(spotPool.length).padStart(2,'0')}`,
+      nextSpotlight: this.nextSpotlight, prevSpotlight: this.prevSpotlight,
+      openSpotlight: () => spotlight.id && this.openPost(spotlight.id),
+      railHeadJustify: s.sidebarCollapsed ? 'center' : 'space-between',
+      openConnectModal: () => this.openConnectModal(), openConnectWhatsApp: () => this.openConnectModal('WhatsApp'),
+      openConnectTelegram: () => this.openConnectModal('Telegram'), openConnectDiscord: () => this.openConnectModal('Discord'),
+      closeConnectModal: this.closeConnectModal, connectModalOpen: s.connectModalOpen,
+      pickWhatsApp: this.pickWhatsApp, pickTelegram: this.pickTelegram, pickDiscord: this.pickDiscord,
+      nextConnectStep: this.nextConnectStep, finishConnect: this.finishConnect,
+      isConnectStep0: s.connectStep === 0, isConnectStep1: s.connectStep === 1, isConnectStep2: s.connectStep === 2,
+      connectPlatform: s.connectPlatform, connectInstructions: CONNECT_TEXT[s.connectPlatform] || '',
+      connectStepDots,
     };
   }
 }

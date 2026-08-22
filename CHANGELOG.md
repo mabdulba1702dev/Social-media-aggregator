@@ -10,8 +10,25 @@ the same PR — see `CONTRIBUTING.md`.
 
 ## [Unreleased]
 
+### Fixed
+
+- Instagram embed provider (`lib/embed-providers/instagram.ts`) rejected the
+  very common `instagram.com/username/p/CODE/` link form (only the bare
+  `/p/CODE/` form matched) — found while saving a real curated post. Regex
+  broadened to accept an optional single path segment before `p`/`reel`;
+  covered by a new `instagram.test.ts`.
+
 ### Added
 
+- Featured posts on the landing page (`components/featured-posts.tsx`): 5
+  real, curated public posts (YouTube, X, Instagram, Pinterest, TikTok —
+  found via web search, verified against each platform's real oEmbed
+  endpoint before saving) rendered through the exact same pipeline as
+  every other post — no separate "video" rendering path needed, since
+  `embed_html` already produces a real playable widget for video platforms.
+  Backed by a real `boards` row (slug `featured`, `visibility: 'public'`),
+  readable by signed-out visitors under the existing RLS policy with no new
+  policy needed.
 - Sources UI (`app/boards/[boardId]/sources/`): connect/rename/pause/
   disconnect a Telegram/Discord/WhatsApp group against a board from a real
   page, replacing the "insert a `sources` row directly" workaround. Shows
