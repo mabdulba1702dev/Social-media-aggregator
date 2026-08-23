@@ -10,6 +10,16 @@ the same PR — see `CONTRIBUTING.md`.
 
 ## [Unreleased]
 
+### Added
+
+- Discord Gateway worker (`worker/src/discord.ts`): `discord.js` added to
+  the `worker/` workspace, listens for messages in server channels the
+  bot has been invited to and feeds them into the same shared
+  `handleIncomingMessage` pipeline WhatsApp/Telegram already use, keyed
+  on channel ID (matching the sources UI's "Copy Channel ID" guidance).
+  `npm run dev:discord`/`start:discord` added alongside the existing
+  WhatsApp scripts. Not yet run against a real bot token/server.
+
 ### Fixed
 
 - Instagram embed provider (`lib/embed-providers/instagram.ts`) rejected the

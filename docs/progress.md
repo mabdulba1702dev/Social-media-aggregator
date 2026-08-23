@@ -8,7 +8,7 @@ item lands or a decision gets made — this is the "what's true right now" doc;
 
 **Last updated:** 2026-08-22
 
-**Phase completion:** Phase 0: 17/17. Phase 1: 8 done, 1 partial, 2 not started (of 11). Phase 2: 4 done (1 partial), 3 not started (of 8). Phase 3: 1 done (of 4). Phase 4: 0/4. See `build-order.md` for the itemized list.
+**Phase completion:** Phase 0: 17/17. Phase 1: 8 done, 1 partial, 2 not started (of 11). Phase 2: 5 done (1 partial), 2 not started (of 8). Phase 3: 1 done (of 4). Phase 4: 0/4. See `build-order.md` for the itemized list.
 
 ### What's working right now
 
@@ -21,6 +21,7 @@ item lands or a decision gets made — this is the "what's true right now" doc;
 - **Sources UI** (`app/boards/[boardId]/sources/`): connect/rename/pause/disconnect a Telegram/Discord/WhatsApp group against a board, linked from the board page header ("Connected groups →"). Replaces the direct-DB-insert workaround. v1 still requires pasting the platform's raw group/channel ID by hand — no in-app discovery mechanism yet (see `notes/ui-scalability-scope.md` for the "detected but unconnected" staging-table idea this would need).
 - **WhatsApp**: worker code built and paired live against a real dedicated number, verified working end-to-end at the connection layer. Can now be wired to a real board via the sources UI above. Worker itself still only runs locally (see "What's blocking" below).
 - **Telegram**: webhook built (`app/api/telegram/route.ts`), secret-token verified, end-to-end tested against a real dev server. Can now be connected to a real board via the sources UI above. Still not registered against a deployed URL (`setWebhook`).
+- **Discord**: Gateway listener built (`worker/src/discord.ts`, `discord.js`), same shared pipeline as WhatsApp/Telegram, keyed on channel ID. Not yet tested against a real bot/server — needs a real `DISCORD_BOT_TOKEN` with Message Content Intent enabled, and the worker isn't deployed anywhere (same blocker as WhatsApp).
 - **Infra**: real Supabase project (linked, both migrations pushed), Vercel connected (auto-deploys previews per PR and production on merge to `main`), auto-merge on green CI (branch protection requires the CI check; PRs merge themselves once green), npm workspaces monorepo (`worker/` shares `lib/` with the Next.js app).
 
 ### Testing debt (deliberately deferred, 2026-08-22 — do not forget)
@@ -29,7 +30,8 @@ Explicit project-owner call: testing was put off this session to keep building �
 
 - **Sources UI** (`app/boards/[boardId]/sources/`) — built and gate-passing, but never exercised in a real browser: connect/rename/pause/resume/disconnect all still need a real click-through, including the `unique(platform, external_group_id)` duplicate-connection error path.
 - **Featured posts landing section** (`components/featured-posts.tsx`) — 5 real posts saved and confirmed via direct DB query + a raw `curl` against each oEmbed endpoint, but the actual rendered page (`/` signed out) has not been looked at in a browser — layout, dark mode, mobile wrap all unverified.
-- **Real end-to-end bot connections** — connecting an actual Telegram/WhatsApp/Discord group to a board through the new sources UI and confirming a real posted link lands on the board hasn't been done. Telegram additionally still needs `setWebhook` registered against the deployed URL first (see "What's blocking" below) before this is even testable for that platform.
+- **Real end-to-end bot connections** — connecting an actual Telegram/WhatsApp/Discord group to a board through the new sources UI and confirming a real posted link lands on the board hasn't been done for any of the three platforms. Telegram additionally still needs `setWebhook` registered against the deployed URL first, and Discord needs a real bot token + Message Content Intent enabled — see "What's blocking" below.
+- **Discord worker** (`worker/src/discord.ts`) specifically — written against discord.js's documented API and typechecks clean, but has never been run against a real Discord bot token or server. Gate-passing isn't the same as working.
 
 See `docs/testing.md` for how UI verification normally happens here (acceptance criteria + a human checking the Vercel preview) — that pass is what's outstanding for all three items above.
 
@@ -76,7 +78,7 @@ Logged here rather than silently deferred, per `CLAUDE.md`'s rule. See
 
 1. **Telegram specifically:** `setWebhook` hasn't been called against a real deployed URL yet — the route works (verified against a local dev server), it's just not registered with Telegram. Sources UI can connect a group to a board today, but nothing arrives until this is done.
 2. **WhatsApp specifically:** worker isn't deployed anywhere yet (Railway/Fly.io) — currently only runnable locally, and stopped when not in active use (see `CLAUDE.md`'s Local Dev Hygiene section).
-3. **Discord specifically:** worker doesn't exist yet at all (`worker/src/discord.ts` not built, no package chosen). The sources UI accepts a Discord channel ID, but connecting one does nothing until the worker is built.
+3. **Discord specifically:** worker built (`worker/src/discord.ts`) but never run against a real bot/server — needs a real `DISCORD_BOT_TOKEN`, Message Content Intent enabled in the Discord Developer Portal, and (like WhatsApp) isn't deployed anywhere yet.
 
 ### What's blocking the rest of Phase 1
 
@@ -91,7 +93,8 @@ Logged here rather than silently deferred, per `CLAUDE.md`'s rule. See
 
 ### Known non-blocking issues
 
-- `npm audit` reports 3 high-severity advisories, all transitive through Next.js's bundled `postcss`/`sharp`, only fixable via a Next 15 → 16 major bump. Not urgent at this size/stage; revisit before any public deploy.
+- `npm audit` reports 3 high-severity advisories in the main app, all transitive through Next.js's bundled `postcss`/`sharp`, only fixable via a Next 15 → 16 major bump. Not urgent at this size/stage; revisit before any public deploy.
+- `worker/` separately reports 1 high-severity advisory (libvips CVEs via `sharp`, itself transitive through `baileys`) — pre-existing, not introduced by the Discord worker build. `npm audit fix` doesn't resolve it without a breaking change. Same "not urgent yet, revisit before public deploy" status as the main app's.
 
 ### Recently completed
 
@@ -120,5 +123,6 @@ Logged here rather than silently deferred, per `CLAUDE.md`'s rule. See
 - 2026-08-20 — Investigated browser/computer-use access for real UI testing: no tool available in this session; confirmed Vercel's deployment protection blocks plain fetches against every project URL; configured a Playwright MCP server (browser binary installed, server process confirmed running) but it never bound to this specific session. Concluded this is a session-binding limitation of this environment, not a fixable config issue — continuing with user-provided screenshots, which have already caught every real UI bug this session.
 - 2026-08-20 — Duplicate-board bug confirmed fixed via a real user screenshot of the live "Manage boards" page — exactly one board per name now, sidebar navigation and card treatment rendering correctly in production.
 - 2026-08-21 — Lazy-loading embeds built (Phase 1 item 6, now done). New `components/lazy-mount.tsx` defers each embed's mount via `IntersectionObserver` (400px rootMargin) instead of rendering every card's oEmbed script immediately — a plain skeleton placeholder shows until a card nears the viewport. Also added native `loading="lazy"` to the static-fallback thumbnail `<img>`. Full lint/typecheck/test/build gate verified clean.
+- 2026-08-22 — Discord Gateway worker built (`worker/src/discord.ts`, Phase 2 item 5, now done): `discord.js` added to the worker workspace, same shared `handleIncomingMessage` pipeline WhatsApp/Telegram use, keyed on channel ID per the sources UI's "Copy Channel ID" guidance. `worker/README.md`/`.env.example`/`package.json` (`dev:discord`/`start:discord` scripts) updated. Not yet tested against a real bot/server — typechecks clean, that's all that's confirmed (see "Testing debt"). Found a pre-existing (not newly introduced) high-severity `npm audit` advisory in `worker/`'s `baileys → sharp` chain while installing — logged in "Known non-blocking issues," not fixed (no non-breaking fix available).
 - 2026-08-22 — Featured posts landing-page section built: 5 real, curated public posts (found via web search, verified against each platform's real oEmbed endpoint before saving — not fabricated URLs) saved into a new real `visibility: 'public'` board (slug `featured`) via a one-off service-role script, rendered on the landing page through the exact same `EmbedHtml`/`LazyMount` pipeline every other post uses — proved no separate "trending video" rendering logic is needed. Found and fixed a real bug in the process: `lib/embed-providers/instagram.ts`'s URL matcher rejected the common `instagram.com/username/p/CODE/` link form, only accepting the bare `/p/CODE/` form — fixed, covered by a new `instagram.test.ts`. Full gate verified clean.
 - 2026-08-21 — Sources UI built (Phase 2 item 6a, new): `app/boards/[boardId]/sources/` — connect/rename/pause/disconnect a Telegram/Discord/WhatsApp group against a board, with per-platform in-form guidance for finding the raw group/channel ID and a friendly "already connected to a board" message on the `unique(platform, external_group_id)` conflict. Replaces the direct-DB-insert workaround `setup-guide.md` previously documented for both Telegram and WhatsApp (both docs updated to point at the new page). `eslint.config.mjs` also updated to ignore the newly-added design-canvas export under `docs/` (its vendored `support.js`/`_ds_bundle.js` aren't hand-written app code and shouldn't be linted as if they were). Full lint/typecheck/test/build gate verified clean.
