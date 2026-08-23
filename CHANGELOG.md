@@ -22,6 +22,13 @@ the same PR — see `CONTRIBUTING.md`.
 
 ### Fixed
 
+- YouTube embeds rendered tiny (200×113, YouTube oEmbed's own default) because
+  `lib/embed-providers/youtube.ts` never requested a `maxwidth` — found from a
+  real screenshot of the featured-posts landing section. Added `maxwidth=500`,
+  same pattern `x.ts` already used. Also refreshed the one already-saved
+  featured post's cached `embed_html` — the code fix alone doesn't touch
+  posts saved before it, since `embed_html` is cached at save time, not
+  re-fetched on render.
 - Instagram embed provider (`lib/embed-providers/instagram.ts`) rejected the
   very common `instagram.com/username/p/CODE/` link form (only the bare
   `/p/CODE/` form matched) — found while saving a real curated post. Regex

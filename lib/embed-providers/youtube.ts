@@ -12,6 +12,12 @@ export const youtubeProvider: EmbedProvider = {
   },
 
   fetchEmbed(url) {
-    return fetchStandardOEmbed(`https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`);
+    // No maxwidth defaults to a tiny 200x113 iframe (YouTube's own oEmbed
+    // default) — request something that actually fills a masonry card;
+    // the CSS in globals.css's .embed-body rules caps it back down on
+    // narrower columns, same pattern as x.ts's maxwidth=380.
+    return fetchStandardOEmbed(
+      `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json&maxwidth=500`
+    );
   },
 };
