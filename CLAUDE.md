@@ -73,6 +73,7 @@ For *third-party* skills (not specific to this project), use [skills.sh](https:/
 - `docs/testing.md` — testing strategy and the reasoning behind it (unit scope, no automated E2E yet, staging via Vercel previews, load testing as a targeted exercise not a standing suite).
 - `CHANGELOG.md` — dated entries (Keep a Changelog format) for every behavior/schema/dependency change; add an entry in the same PR.
 - `swe.md` — gitignored, personal learning notes tying SWE fundamentals to this project's actual decisions (PRD §2's secondary goal). Not team-facing, don't reference it as a source of project requirements.
+- `notes/` — gitignored, personal scoping/reference docs: `ui-scalability-scope.md` (open UI and scalability decisions not yet made), `swe-glossary.md` (core SWE terms explained through this codebase's real decisions), `21st-dev-deep-dive.md` (how the 21st.dev component registry actually works, what's been learned using it). Same status as `swe.md` — not team-facing, not a source of requirements.
 
 ## Open Items
 

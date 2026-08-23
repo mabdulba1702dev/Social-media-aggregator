@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AddPostForm } from "./add-post-form";
@@ -79,11 +80,19 @@ export default async function BoardPage({
 
   return (
     <div className="flex flex-1 flex-col">
-      <div className="border-b border-border px-8 py-5">
-        <h1 className="text-[22px] font-bold tracking-tight text-text">{board.name}</h1>
-        <p className="mt-1 text-[13px] text-text-muted">
-          {posts.length} {posts.length === 1 ? "post" : "posts"}
-        </p>
+      <div className="flex items-start justify-between gap-4 border-b border-border px-8 py-5">
+        <div>
+          <h1 className="text-[22px] font-bold tracking-tight text-text">{board.name}</h1>
+          <p className="mt-1 text-[13px] text-text-muted">
+            {posts.length} {posts.length === 1 ? "post" : "posts"}
+          </p>
+        </div>
+        <Link
+          href={`/boards/${boardId}/sources`}
+          className="mt-1 shrink-0 text-[13px] text-text-muted transition-colors duration-150 hover:text-text"
+        >
+          Connected groups →
+        </Link>
       </div>
 
       <div className="flex flex-col gap-4 px-8 pt-5">

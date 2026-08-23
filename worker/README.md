@@ -9,9 +9,11 @@ Telegram does **not** need anything here — it runs as a normal webhook route i
 
 ## Status
 
-Empty scaffold — intentionally not implemented yet. Per `CLAUDE.md`'s build order, this is Phase 2 work (group ingestion), which comes after Phase 1 (manual add + core embeds + personal boards) per `docs/PRD.md` §13. When you get there, use the `add-ingestion-source` skill in `.claude/skills/` — it specifies the exact pipeline shape (write to `ingestion_events` first, then extract → blocklist-check → dedup-check → embed-fetch → insert `post`) that both the Discord and WhatsApp listeners in this worker need to follow.
+Both listeners are built: `src/whatsapp.ts` (Baileys, paired live against a real dedicated number — see `docs/setup-guide.md` §6's risk checklist) and `src/discord.ts` (Gateway, needs `DISCORD_BOT_TOKEN` + Message Content Intent enabled in the Discord Developer Portal). Both call into the shared `pipeline.ts`, so dedup/blocklist/embed-fetch logic lives in exactly one place. **Not yet deployed anywhere** — currently only runnable locally, and per `CLAUDE.md`'s Local Dev Hygiene section, shouldn't be left running when not in active use.
 
-## Intended Shape (not yet built)
+Run each listener as its own process — `npm run dev` / `npm run start` for WhatsApp, `npm run dev:discord` / `npm run start:discord` for Discord (both from this directory).
+
+## Shape
 
 ```
 worker/
@@ -23,7 +25,7 @@ worker/
 └── .env.example
 ```
 
-Both listeners should call into one shared `pipeline.ts` rather than duplicating the dedup/blocklist/embed-fetch logic per platform — that's the whole point of `add-ingestion-source` describing one pipeline shape instead of one per platform.
+Both listeners call into one shared `pipeline.ts` rather than duplicating the dedup/blocklist/embed-fetch logic per platform — that's the whole point of `add-ingestion-source` describing one pipeline shape instead of one per platform.
 
 ## Deploying
 

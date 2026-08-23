@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import { Hero } from "@/components/hero";
+import { FeaturedPosts } from "@/components/featured-posts";
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -13,6 +14,7 @@ export default async function HomePage() {
     return (
       <main className="min-h-screen">
         <Hero />
+        <FeaturedPosts />
       </main>
     );
   }

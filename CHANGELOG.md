@@ -12,6 +12,61 @@ the same PR — see `CONTRIBUTING.md`.
 
 ### Added
 
+- Connect-a-group modal (`app/boards/[boardId]/sources/connect-source-modal.tsx`):
+  replaces the always-visible connect form with a real 3-step flow (pick
+  platform → per-platform instructions + paste the raw ID → confirmed),
+  on a new `components/ui/dialog.tsx` (`@radix-ui/react-dialog`, remapped
+  onto this project's tokens — the app's first modal primitive).
+  Deliberately has no "QR code" step for any platform — there's no real
+  scan-to-join mechanism for Telegram/Discord, and WhatsApp's Baileys
+  pairing QR is a worker-level concept, not per-source; logged as a real
+  future want, not built.
+- Discord Gateway worker (`worker/src/discord.ts`): `discord.js` added to
+  the `worker/` workspace, listens for messages in server channels the
+  bot has been invited to and feeds them into the same shared
+  `handleIncomingMessage` pipeline WhatsApp/Telegram already use, keyed
+  on channel ID (matching the sources UI's "Copy Channel ID" guidance).
+  `npm run dev:discord`/`start:discord` added alongside the existing
+  WhatsApp scripts. Not yet run against a real bot token/server.
+
+### Fixed
+
+- YouTube embeds rendered tiny (200×113, YouTube oEmbed's own default) because
+  `lib/embed-providers/youtube.ts` never requested a `maxwidth` — found from a
+  real screenshot of the featured-posts landing section. Added `maxwidth=500`,
+  same pattern `x.ts` already used. Also refreshed the one already-saved
+  featured post's cached `embed_html` — the code fix alone doesn't touch
+  posts saved before it, since `embed_html` is cached at save time, not
+  re-fetched on render.
+- Instagram embed provider (`lib/embed-providers/instagram.ts`) rejected the
+  very common `instagram.com/username/p/CODE/` link form (only the bare
+  `/p/CODE/` form matched) — found while saving a real curated post. Regex
+  broadened to accept an optional single path segment before `p`/`reel`;
+  covered by a new `instagram.test.ts`.
+
+### Added
+
+- Featured posts on the landing page (`components/featured-posts.tsx`): 5
+  real, curated public posts (YouTube, X, Instagram, Pinterest, TikTok —
+  found via web search, verified against each platform's real oEmbed
+  endpoint before saving) rendered through the exact same pipeline as
+  every other post — no separate "video" rendering path needed, since
+  `embed_html` already produces a real playable widget for video platforms.
+  Backed by a real `boards` row (slug `featured`, `visibility: 'public'`),
+  readable by signed-out visitors under the existing RLS policy with no new
+  policy needed.
+- Sources UI (`app/boards/[boardId]/sources/`): connect/rename/pause/
+  disconnect a Telegram/Discord/WhatsApp group against a board from a real
+  page, replacing the "insert a `sources` row directly" workaround. Shows
+  per-platform guidance on finding the raw group/channel ID (no in-app
+  discovery mechanism yet — that's still a manual lookup) and surfaces the
+  `unique(platform, external_group_id)` conflict as a friendly "already
+  connected to a board" message rather than a raw DB error.
+- Lazy-mounted embeds (`components/lazy-mount.tsx`): each post card's oEmbed
+  `<script>` now only fetches/executes once the card scrolls near the
+  viewport (`IntersectionObserver`, 400px rootMargin), instead of every
+  embed on a board loading immediately. Shows a skeleton placeholder until
+  then; the static-fallback thumbnail also got native `loading="lazy"`.
 - Hero homepage (`components/hero.tsx`) for unauthenticated visitors,
   replacing the bare placeholder. Hand-built using existing design
   tokens rather than a pulled 21st.dev template (that one turned out

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/modernist-e70b4432-9de9-4106-8989-9c2001eedd97/styles.css">
+</helmet>
+<div style="break-inside:avoid;margin-bottom:var(--space-4);background:var(--color-surface);border:2px solid var(--color-divider);cursor:pointer;position:relative;transition:background-color .3s ease,border-color .22s ease,transform .22s cubic-bezier(.4,0,.2,1),box-shadow .22s cubic-bezier(.4,0,.2,1)" onClick="{{ post.open }}" style-hover="transform:translateY(-3px);box-shadow:var(--shadow-md);border-color:var(--color-text)">
+  <div style="height:{{ post.h }}px;background:{{ post.bg }};position:relative;overflow:hidden;transition:background-color .3s ease">
+    {{ imgNode }}
+
+    <sc-if value="{{ post.isVideo }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;top:10px;left:10px;background:rgba(32,30,29,.72);color:#fff;padding:4px 8px;display:flex;align-items:center;gap:5px;font-family:var(--font-heading);font-weight:800;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M8 5v14l11-7z"/></svg>
+        Video
+      </div>
+    </sc-if>
+    <sc-if value="{{ post.isCarousel }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;top:10px;left:10px;background:rgba(32,30,29,.72);color:#fff;padding:4px 8px;display:flex;align-items:center;gap:5px;font-family:var(--font-heading);font-weight:800;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        Carousel
+      </div>
+    </sc-if>
+    <sc-if value="{{ post.isArticle }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;top:10px;left:10px;background:rgba(32,30,29,.72);color:#fff;padding:4px 8px;display:flex;align-items:center;gap:5px;font-family:var(--font-heading);font-weight:800;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Link
+      </div>
+    </sc-if>
+
+    <div style="position:absolute;inset:0;opacity:0;transition:opacity .18s ease;background:linear-gradient(to top, rgba(32,30,29,.72), transparent 55%);display:flex;flex-direction:column;justify-content:space-between;padding:10px" style-hover="opacity:1">
+      <div style="display:flex;justify-content:flex-end;gap:6px">
+        <span style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 011 1v17l-7-4-7 4V4a1 1 0 011-1z"/></svg>
+        </span>
+        <span style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </span>
+      </div>
+      <sc-if value="{{ post.isVideo }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:6px;color:#fff;font-size:10.5px;font-family:var(--font-heading);font-weight:800;letter-spacing:.05em;text-transform:uppercase">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--color-accent-400)"></span>
+          Autoplay preview
+        </div>
+      </sc-if>
+    </div>
+  </div>
+
+  <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ stopMenuClick }}" style="position:absolute;top:46px;right:10px;background:var(--color-surface);border:1px solid var(--color-divider);box-shadow:var(--shadow-md);z-index:5;min-width:150px;display:flex;flex-direction:column">
+      <a href="#" onClick="{{ stopMenuClick }}" style="padding:9px 12px;font-size:13px;color:var(--color-text);display:flex;align-items:center;gap:8px">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Open original
+      </a>
+      <button onClick="{{ handleCopyLink }}" style="border:none;background:none;text-align:left;cursor:pointer;padding:9px 12px;font-size:13px;color:var(--color-text);display:flex;align-items:center;gap:8px;font-family:var(--font-body)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.07 0l1.93-1.93a5 5 0 00-7.07-7.07L10.5 5.5"/><path d="M14 11a5 5 0 00-7.07 0L5 12.93a5 5 0 007.07 7.07L13.5 18.5"/></svg>
+        Copy link
+      </button>
+      <div class="hr" style="margin:0"></div>
+      <button onClick="{{ handleRemove }}" style="border:none;background:none;text-align:left;cursor:pointer;padding:9px 12px;font-size:13px;color:var(--color-accent-700);display:flex;align-items:center;gap:8px;font-family:var(--font-body)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+        Remove post
+      </button>
+    </div>
+  </sc-if>
+
+  <div style="padding:var(--space-3);display:flex;flex-direction:column;gap:8px;border-top:2px solid var(--color-divider);transition:color .3s ease,border-color .3s ease">
+    <div style="display:flex;align-items:center;gap:6px">
+      <span class="tag tag-neutral">{{ post.platformLabel }}</span>
+      <span class="text-muted" style="font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ post.sourceName }}</span>
+    </div>
+    <div style="font-size:13.5px;line-height:1.3">{{ post.caption }}</div>
+    <div style="display:flex;gap:5px;flex-wrap:wrap">
+      <sc-for list="{{ post.tags }}" as="t" hint-placeholder-count="2">
+        <span class="tag tag-outline">{{ t }}</span>
+      </sc-for>
+    </div>
+    <div class="card-meta">
+      <span>{{ post.sender }}</span>
+      <span>·</span>
+      <span>{{ post.timeAgo }}</span>
+      <span style="margin-left:auto;display:flex;align-items:center;gap:4px">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 011 1v17l-7-4-7 4V4a1 1 0 011-1z"/></svg>
+        {{ post.saves }}
+      </span>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:280,&quot;height&quot;:300}}">
+class Component extends DCLogic {
+  state = { menuOpen:false };
+  toggleMenu = (e) => { e.stopPropagation(); this.setState(s => ({ menuOpen: !s.menuOpen })); };
+  stopMenuClick = (e) => e.stopPropagation();
+  handleCopyLink = (e) => { e.stopPropagation(); this.setState({ menuOpen:false }); };
+  handleRemove = (e) => {
+    e.stopPropagation();
+    this.setState({ menuOpen:false });
+    if (this.props.post && this.props.post.remove) this.props.post.remove();
+  };
+  renderVals() {
+    const p = this.props.post;
+    return {
+      imgNode: p && p.img ? React.createElement('img', { src:p.img, className:'grayscale', style:{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' } }) : null,
+      menuOpen: this.state.menuOpen,
+      toggleMenu: this.toggleMenu,
+      stopMenuClick: this.stopMenuClick,
+      handleCopyLink: this.handleCopyLink,
+      handleRemove: this.handleRemove,
+    };
+  }
+}
+
+</script>
+</body>
+</html>
