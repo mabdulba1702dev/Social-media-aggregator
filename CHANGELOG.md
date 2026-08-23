@@ -12,6 +12,15 @@ the same PR — see `CONTRIBUTING.md`.
 
 ### Added
 
+- Connect-a-group modal (`app/boards/[boardId]/sources/connect-source-modal.tsx`):
+  replaces the always-visible connect form with a real 3-step flow (pick
+  platform → per-platform instructions + paste the raw ID → confirmed),
+  on a new `components/ui/dialog.tsx` (`@radix-ui/react-dialog`, remapped
+  onto this project's tokens — the app's first modal primitive).
+  Deliberately has no "QR code" step for any platform — there's no real
+  scan-to-join mechanism for Telegram/Discord, and WhatsApp's Baileys
+  pairing QR is a worker-level concept, not per-source; logged as a real
+  future want, not built.
 - Discord Gateway worker (`worker/src/discord.ts`): `discord.js` added to
   the `worker/` workspace, listens for messages in server channels the
   bot has been invited to and feeds them into the same shared

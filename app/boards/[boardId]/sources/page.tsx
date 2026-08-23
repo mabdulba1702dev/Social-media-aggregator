@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { ConnectSourceForm } from "./connect-source-form";
+import { ConnectSourceModal } from "./connect-source-modal";
 import { SourceRow } from "./source-row";
 import type { SourcePlatform, SourceStatus } from "./actions";
 
@@ -43,19 +43,24 @@ export default async function SourcesPage({ params }: { params: Promise<{ boardI
 
   return (
     <div className="flex flex-1 flex-col">
-      <div className="border-b border-border px-8 py-5">
-        <Link href={`/boards/${boardId}`} className="text-[13px] text-text-muted hover:text-text">
-          ← {board.name}
-        </Link>
-        <h1 className="mt-1 text-[22px] font-bold tracking-tight text-text">Connected groups</h1>
-        <p className="mt-1 text-[13px] text-text-muted">
-          Every link posted in a connected Telegram, Discord, or WhatsApp group lands on this board automatically.
-        </p>
+      <div className="flex items-start justify-between gap-4 border-b border-border px-8 py-5">
+        <div>
+          <Link href={`/boards/${boardId}`} className="text-[13px] text-text-muted hover:text-text">
+            ← {board.name}
+          </Link>
+          <h1 className="mt-1 text-[22px] font-bold tracking-tight text-text">Connected groups</h1>
+          <p className="mt-1 text-[13px] text-text-muted">
+            Every link posted in a connected Telegram, Discord, or WhatsApp group lands on this board automatically.
+          </p>
+        </div>
+        <div className="mt-1 shrink-0">
+          <ConnectSourceModal boardId={boardId} />
+        </div>
       </div>
 
       <div className="flex flex-col gap-6 px-8 py-6">
         {sources.length === 0 ? (
-          <p className="text-sm text-text-muted">No groups connected yet — connect one below.</p>
+          <p className="text-sm text-text-muted">No groups connected yet — connect one above.</p>
         ) : (
           <div className="flex flex-col gap-2">
             {sources.map((source) => (
@@ -63,8 +68,6 @@ export default async function SourcesPage({ params }: { params: Promise<{ boardI
             ))}
           </div>
         )}
-
-        <ConnectSourceForm boardId={boardId} />
       </div>
     </div>
   );
