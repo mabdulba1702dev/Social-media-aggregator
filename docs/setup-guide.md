@@ -103,7 +103,8 @@ Recommend **private** repo while this is pre-launch.
 3. Under **Privileged Gateway Intents**, enable **Message Content Intent** (required to read link text in messages).
 4. Use the OAuth2 URL generator (scope: `bot`, permissions: Read Messages/View Channels) to get an invite link, and add the bot to your server.
 5. Remember from the PRD: Discord's Gateway connection needs a small always-on worker (Railway/Fly.io free tier) — it won't run on Vercel's serverless functions like the Telegram webhook does.
-6. Connecting a channel to a board: same **Connected groups** page as Telegram (`/boards/<id>/sources`) — pick Discord, paste the channel ID (enable Developer Mode in Discord's own settings, then right-click the channel → Copy Channel ID). The Discord worker itself isn't built yet (`worker/src/discord.ts` doesn't exist) — connecting the source now doesn't do anything until that lands.
+6. Connecting a channel to a board: same **Connected groups** page as Telegram (`/boards/<id>/sources`) — pick Discord, paste the channel ID (enable Developer Mode in Discord's own settings, then right-click the channel → Copy Channel ID).
+7. Run it: `worker/src/discord.ts` is built — `npm run dev:discord` (from `worker/`) for local testing, or see §6a for deploying it for real.
 
 **WhatsApp** (moved up into Phase 2, alongside Discord — see the roadmap update in `docs/PRD.md` §13): using **Baileys** (`WhiskeySockets/Baileys` on GitHub/npm), the most actively maintained and widely used unofficial WhatsApp Web library. There is still no official API for reading messages in a normal group, so this remains a real risk, not a solved problem — treat the following as risk *reduction*, not risk *elimination*:
 
@@ -120,6 +121,29 @@ npm install baileys
 Baileys authenticates by scanning a QR code (or entering a pairing code) with the dedicated number's WhatsApp app — no API key or developer account involved. Like Discord, this needs the always-on worker (not a Vercel serverless function) to hold the persistent connection and store the auth session (persist it in Supabase Storage so a worker restart doesn't force re-pairing).
 
 Connecting a WhatsApp group to a board: same **Connected groups** page (`/boards/<id>/sources`) — pick WhatsApp, paste the group's JID (ends in `@g.us`; the worker's own console logs it the first time a message from an unconnected group arrives).
+
+## 6a. Deploying the Worker (Discord + WhatsApp)
+
+`worker/` needs to run as **two separate always-on services**, not one — `npm run start` (WhatsApp) and `npm run start:discord` (Discord) are two independent long-running processes, each holding its own persistent connection. Steps below use Railway (simplest free-tier flow for this); Fly.io works the same way in spirit if you'd rather use that.
+
+1. **Create two Railway services from the same GitHub repo** — Railway → New Project → Deploy from GitHub repo → select the repo, once for each service (or "New Service" within the same project, twice).
+2. **For each service**, in Settings:
+   - **Root Directory**: leave as the repo root (not `worker/`) — this is an npm workspace, and installing from the root keeps `worker/`'s deps resolved against the real `package-lock.json` instead of a standalone install.
+   - **Start Command**: `npm run start -w worker` for the WhatsApp service, `npm run start:discord -w worker` for the Discord service.
+3. **Environment variables**, both services need:
+   - `SUPABASE_URL` (same value as `NEXT_PUBLIC_SUPABASE_URL` in the main app)
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   
+   WhatsApp service additionally needs:
+   - `WHATSAPP_PAIRING_NUMBER` — only used the first time, for the pairing-code request.
+   - `WHATSAPP_SESSION_STORAGE_PATH` — see the volume note below.
+   
+   Discord service additionally needs:
+   - `DISCORD_BOT_TOKEN`
+4. **WhatsApp session persistence — read this before deploying.** `worker/src/whatsapp.ts` currently writes the paired session to local disk (`useMultiFileAuthState`) — it does **not** yet sync to Supabase Storage the way the rest of this doc has been describing as the eventual plan. On Railway (and most container hosts), local disk is wiped on every redeploy/restart unless you attach a persistent **Volume**. Two ways to handle this today:
+   - **Attach a Railway Volume** to the WhatsApp service (Settings → Volumes), mount it at e.g. `/data/whatsapp-session`, and set `WHATSAPP_SESSION_STORAGE_PATH=/data/whatsapp-session`. A session already paired locally (`worker/whatsapp-session/` — this project already has one, paired against the real dedicated number) can be uploaded into that volume directly so you don't have to re-pair.
+   - Or treat re-pairing as acceptable for now (fine for a first real test, not for anything you want to stay connected) and skip the volume.
+5. **Deploy.** Watch each service's live log stream in the Railway dashboard — the Discord service should log "Discord Gateway connected"; the WhatsApp service (if re-pairing) logs a pairing code to enter under WhatsApp → Linked Devices → Link with phone number.
 
 ## 7. 21st.dev — Magic MCP (AI-assisted UI components)
 
