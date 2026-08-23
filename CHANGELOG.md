@@ -10,6 +10,23 @@ the same PR — see `CONTRIBUTING.md`.
 
 ## [Unreleased]
 
+### Fixed
+
+- Lazy-mounted embeds (X, Instagram — likely Facebook too) silently stayed
+  un-hydrated (raw blockquote text, no widget) on any card that mounted
+  after the platform's widget script was already loaded from an earlier
+  card on the page — found from a real screenshot of a board with three
+  posts. Twitter's `widgets.js`/Instagram's `embed.js` guard against
+  re-initializing, so re-inserting their `<script>` tag alone silently
+  no-ops the second time; `components/embed-html.tsx` now also calls each
+  platform's documented on-demand re-scan API
+  (`twttr.widgets.load()`/`instgrm.Embeds.process()`/`FB.XFBML.parse()`),
+  which is what actually exists for exactly this "content added after
+  the page's initial load" case.
+- Bulk-refreshed every already-saved YouTube post's cached `embed_html`
+  still carrying the old tiny `width="200"` size from before the
+  `maxwidth=500` fix — not just the one instance noticed earlier.
+
 ### Added
 
 - Connect-a-group modal (`app/boards/[boardId]/sources/connect-source-modal.tsx`):
