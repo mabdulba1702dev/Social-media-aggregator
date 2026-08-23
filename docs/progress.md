@@ -23,6 +23,16 @@ item lands or a decision gets made — this is the "what's true right now" doc;
 - **Telegram**: webhook built (`app/api/telegram/route.ts`), secret-token verified, end-to-end tested against a real dev server. Can now be connected to a real board via the sources UI above. Still not registered against a deployed URL (`setWebhook`).
 - **Infra**: real Supabase project (linked, both migrations pushed), Vercel connected (auto-deploys previews per PR and production on merge to `main`), auto-merge on green CI (branch protection requires the CI check; PRs merge themselves once green), npm workspaces monorepo (`worker/` shares `lib/` with the Next.js app).
 
+### Testing debt (deliberately deferred, 2026-08-22 — do not forget)
+
+Explicit project-owner call: testing was put off this session to keep building — logged here so it stays visible rather than silently assumed done. None of the following has been clicked through in a real browser or verified against a real bot connection yet:
+
+- **Sources UI** (`app/boards/[boardId]/sources/`) — built and gate-passing, but never exercised in a real browser: connect/rename/pause/resume/disconnect all still need a real click-through, including the `unique(platform, external_group_id)` duplicate-connection error path.
+- **Featured posts landing section** (`components/featured-posts.tsx`) — 5 real posts saved and confirmed via direct DB query + a raw `curl` against each oEmbed endpoint, but the actual rendered page (`/` signed out) has not been looked at in a browser — layout, dark mode, mobile wrap all unverified.
+- **Real end-to-end bot connections** — connecting an actual Telegram/WhatsApp/Discord group to a board through the new sources UI and confirming a real posted link lands on the board hasn't been done. Telegram additionally still needs `setWebhook` registered against the deployed URL first (see "What's blocking" below) before this is even testable for that platform.
+
+See `docs/testing.md` for how UI verification normally happens here (acceptance criteria + a human checking the Vercel preview) — that pass is what's outstanding for all three items above.
+
 ### Known environment limitation
 
 No browser/computer-use tool is available to me in this session — confirmed via direct investigation (Vercel's deployment protection blocks plain HTTP fetches against every project URL; a Playwright MCP server was configured but never bound to this specific session despite the browser binary being installed and the server process confirmed running). **Your screenshots are the actual working substitute** and have caught every real UI bug found so far (duplicate boards, invisible navigation, the Twitter width overflow) — this isn't a blocker, just the established workflow.
