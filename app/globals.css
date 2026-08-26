@@ -2,34 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Design tokens — mirrors docs/design-system.md. Keep both in sync. */
+/* Design tokens — mirrors docs/design-system.md. Keep both in sync.
+   Values taken directly from the Modernist system's own styles.css
+   (docs/Social media embed aggregator UI/_ds/.../styles.css) rather than
+   approximated, mapped onto this app's existing token names so component
+   code (bg-surface, text-text-muted, etc.) doesn't need to change. */
 :root {
-  --bg: #f6f5f3;
-  --surface: #ffffff;
-  --surface-2: #fbfaf8;
-  --border: #e7e4de;
-  --text: #201e1b;
-  --text-muted: #6f6a63;
-  --text-faint: #a49e94;
-  --accent: #2f5d4f;
-  --accent-soft: #e4ede9;
+  --bg: #f3f2f2;
+  --surface: #eae9e9;
+  --surface-2: #f8f4f4;
+  --border: #d7d3d3;
+  --text: #201e1d;
+  --text-muted: #7d7979;
+  --text-faint: #9b9797;
+  --accent: #ec3013;
+  --accent-soft: #fff2ef;
 }
 
 .dark {
-  --bg: #16151a;
-  --surface: #1e1d23;
-  --surface-2: #232228;
-  --border: #302f37;
-  --text: #efeeee;
-  --text-muted: #a5a3ab;
-  --text-faint: #706e78;
-  --accent: #7fc4ab;
-  --accent-soft: #22332c;
+  --bg: #1c1a1a;
+  --surface: #272424;
+  --surface-2: #2d2b2b;
+  --border: #605d5d;
+  --text: #f3f2f2;
+  --text-muted: #bab6b6;
+  --text-faint: #9b9797;
+  --accent: #ff563c;
+  --accent-soft: #4d170e;
 }
 
 body {
   background-color: var(--bg);
   color: var(--text);
+  font-family: var(--font-archivo), system-ui, sans-serif;
 }
 
 /* Third-party embed widgets (Twitter/X especially) pick their own intrinsic
