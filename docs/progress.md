@@ -90,6 +90,28 @@ the current design system, then reskinning, rather than building it twice.
 Logged here rather than silently deferred, per `CLAUDE.md`'s rule. See
 `notes/ui-scalability-scope.md` for more on this once it's picked back up.
 
+**Bot-ingestion work is now far enough along (2026-08-25) that this is
+being picked back up** — tracked as [GitHub issue #28](https://github.com/mabdulba1702dev/Social-media-aggregator/issues/28).
+The mockup was updated again in the meantime (substantial `Pinboard.dc.html`
+rewrite — grid/list feed-view toggle, richer per-post comment threads,
+unread counts per source) — scope still needs a real decision pass before
+writing any reskin code, per #28.
+
+### GitHub issues filed 2026-08-25 — the real fix for issue #20, split by platform
+
+Manually working around #20's raw-ID-discovery problem three times this
+session (WhatsApp's direct group listing, DB queries standing in for logs,
+the pipeline logging fix) made the shape of an actual fix clear enough to
+scope for real, split per-platform since each has a genuinely different
+mechanism available:
+
+- [#25](https://github.com/mabdulba1702dev/Social-media-aggregator/issues/25) — **Discord**: OAuth redirect flow (Discord's own consent screen lets the user pick a server, no copy-pasting an ID). Open question flagged in the issue: OAuth gives a guild ID, not a channel ID — needs a decision (channel picker after redirect, vs. changing ingestion to guild-level) before building.
+- [#26](https://github.com/mabdulba1702dev/Social-media-aggregator/issues/26) — **Telegram**: deep link (`t.me/bot?startgroup=<token>`) — Telegram's own native "pick a group" UI, then the bot receives `/start <token>` automatically via the existing webhook. Simplest of the three to build (no OAuth app registration needed).
+- [#27](https://github.com/mabdulba1702dev/Social-media-aggregator/issues/27) — **WhatsApp**: no OAuth/deep-link mechanism exists for this (regular phone number, not a bot platform) — scoped down to UX polish (a real QR/contact card) plus turning this session's `groupFetchAllParticipating()` discovery trick into a real feature instead of a one-off script.
+- [#29](https://github.com/mabdulba1702dev/Social-media-aggregator/issues/29) — **Scaling/SWE pass**: worker deployment, per-provider rate limiting, queue decision, RLS cost — the thinking-through items from `swe.md`/`notes/ui-scalability-scope.md`, now made visible outside personal notes since they affect real infra decisions.
+
+None of #25–29 are built yet — filed for planning, per explicit request to note things down before building.
+
 ### What's blocking WhatsApp/Telegram/Discord going fully live
 
 1. **Telegram specifically:** `setWebhook` hasn't been called against a real deployed URL yet — the route works (verified against a local dev server), it's just not registered with Telegram. Sources UI can connect a group to a board today, but nothing arrives until this is done.
