@@ -31,7 +31,19 @@ const config: Config = {
         }
       },
       borderRadius: {
-        card: "14px"
+        // Modernist system: zero corner radius on every rectangular
+        // element, deliberately — see docs/Social media embed aggregator
+        // UI's readme.md "Don't". Overriding sm/md/lg (not just the custom
+        // `card` token) so shadcn primitives (button, input, dialog) built
+        // against Tailwind's default scale honor this too, without editing
+        // each component file individually. `full` is deliberately left
+        // alone — true circles (avatars, status dots) aren't "rounded
+        // corners" in the same sense, and the mockup itself keeps those.
+        card: "0px",
+        sm: "0px",
+        DEFAULT: "0px",
+        md: "0px",
+        lg: "0px"
       }
     }
   },
