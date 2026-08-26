@@ -34,7 +34,14 @@ export async function handleIncomingMessage(
     .maybeSingle();
 
   if (sourceError) throw sourceError;
-  if (!source) return; // not a connected source for any board — nothing to do
+  if (!source) {
+    // Not a connected source for any board. This is the only place a board
+    // owner can currently discover the raw ID they need to paste into the
+    // connect-a-group modal (see GitHub issue #20) — log it plainly rather
+    // than silently dropping the message.
+    console.log(`[ingestion] no connected source — platform=${message.platform} externalGroupId=${message.externalGroupId}`);
+    return;
+  }
 
   const eventId = await recordEvent(supabase, source.id, message.rawMessageId);
   if (eventId === null) return; // unique violation — already processed, per idempotency guarantee
