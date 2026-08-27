@@ -12,6 +12,12 @@ the same PR — see `CONTRIBUTING.md`.
 
 ### Fixed
 
+- `sources.last_event_at` was never written by `lib/ingestion/pipeline.ts`,
+  so the Sources UI always showed "no links yet" even after real successful
+  ingestion — found from a real Discord source that had processed a message
+  end-to-end but still showed `last_event_at: null`. Added
+  `touchSourceLastEvent()`, called on both `processed` (new post) and
+  `duplicate` (link matched an already-saved post) outcomes.
 - Lazy-mounted embeds (X, Instagram — likely Facebook too) silently stayed
   un-hydrated (raw blockquote text, no widget) on any card that mounted
   after the platform's widget script was already loaded from an earlier

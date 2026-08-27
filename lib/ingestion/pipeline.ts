@@ -67,6 +67,7 @@ export async function handleIncomingMessage(
 
   if (existingPostError) throw existingPostError;
   if (existingPost) {
+    await touchSourceLastEvent(supabase, source.id);
     await markEvent(supabase, eventId, "duplicate", existingPost.id);
     return;
   }
@@ -103,6 +104,7 @@ export async function handleIncomingMessage(
 
     if (postError) throw postError;
 
+    await touchSourceLastEvent(supabase, source.id);
     await markEvent(supabase, eventId, "processed", post.id);
   } catch (err) {
     await markEvent(supabase, eventId, "failed", null, err instanceof Error ? err.message : String(err));
@@ -151,6 +153,16 @@ async function isUrlBlocked(supabase: SupabaseClient, boardId: string, url: stri
       ? host.includes(rule.value.toLowerCase())
       : url.toLowerCase().includes(rule.value.toLowerCase())
   );
+}
+
+/** Records that a real link (new or duplicate) came through this source — drives the Sources UI's "last link" display. */
+async function touchSourceLastEvent(supabase: SupabaseClient, sourceId: string): Promise<void> {
+  const { error } = await supabase
+    .from("sources")
+    .update({ last_event_at: new Date().toISOString() })
+    .eq("id", sourceId);
+
+  if (error) throw error;
 }
 
 async function markEvent(
