@@ -33,3 +33,4 @@ swe.md
 # never commit this under any circumstances (see docs/setup-guide.md §6)
 worker/whatsapp-session/
 whatsapp-session/
+.env*
